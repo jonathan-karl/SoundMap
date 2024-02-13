@@ -13,7 +13,8 @@ class UploadViewController: UIViewController {
     var placeName: String?
     var placeAddress: String?
     var placeDistance: String?
-    var userLocation: CLLocationCoordinate2D?
+    var placeID: String?
+    var userLocation: CLLocation?
     var recording: String?
     
     override func viewDidLoad() {
@@ -25,7 +26,10 @@ class UploadViewController: UIViewController {
 
     @IBAction func uploadPressed(_ sender: UIButton) {
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        print(placeName!)
+        print(userLocation!)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             print("Returning to Root View Controller")
             self.navigationController?.popToRootViewController(animated: true)
         }

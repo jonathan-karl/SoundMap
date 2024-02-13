@@ -26,6 +26,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     var selectedPlaceName: String?
     var selectedPlaceAddress: String?
     var selectedPlaceDistance: String?
+    var selectedPlaceID: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,12 +51,6 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         detailsLabel.isHidden = true
         placeConfirmationButton.isHidden = true
 
-        if navigationController != nil {
-                print("This view controller is part of a navigation stack.")
-        } else {
-            print("This view controller is NOT part of a navigation stack.")
-        }
-        // Do any additional setup after loading the view.
     }
     
     @IBAction func placeConfirmationButtonPressed(_ sender: UIButton) {
@@ -201,6 +196,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 self.selectedPlaceName = place.name ?? "No Name"
                 self.selectedPlaceAddress = place.formattedAddress ?? "No address"
                 self.selectedPlaceDistance = "\(distanceString)km"
+                self.selectedPlaceID = place.placeID
                 
                 // Create the attributed string for the details
                 self.detailsLabel.attributedText = self.attributedDetailString(
@@ -233,7 +229,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
 
     //MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    // Carry over information
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
          if segue.identifier == "recordGo2" {
              if let destinationVC = segue.destination as? RecordAudioViewController {
@@ -241,6 +237,8 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                  destinationVC.placeName = selectedPlaceName
                  destinationVC.placeAddress = selectedPlaceAddress
                  destinationVC.placeDistance = selectedPlaceDistance
+                 destinationVC.placeID = selectedPlaceID
+                 destinationVC.userLocation = currentUserLocation
              }
          }
      }

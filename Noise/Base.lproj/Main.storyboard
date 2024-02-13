@@ -75,7 +75,6 @@
                     <navigationItem key="navigationItem" id="Abl-WR-mvc"/>
                     <connections>
                         <outlet property="detailsLabel" destination="5pp-1o-nmV" id="8sJ-Ff-lnm"/>
-                        <outlet property="placeConfirmationButton" destination="6Gj-tr-aas" id="rsK-Nq-8wv"/>
                         <outlet property="recordIcon" destination="ZQu-Yw-z6l" id="OQy-68-msU"/>
                         <outlet property="searchBar" destination="aA8-sC-BxP" id="hbf-Mw-yo4"/>
                         <outlet property="tableView" destination="pev-JU-U19" id="p9q-mT-iqK"/>
@@ -107,18 +106,8 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Gj-tr-aas">
-                                <rect key="frame" x="16" y="492" width="136" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Correct Place?"/>
-                                <connections>
-                                    <action selector="placeConfirmationButtonPressed:" destination="wDW-HF-Evq" eventType="touchUpInside" id="ael-PF-QLC"/>
-                                    <action selector="placeConfirmationButtonPressed:" destination="vVK-vg-oJQ" eventType="touchUpInside" id="jYU-T3-7M1"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label for Establishment Details" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="9" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5pp-1o-nmV">
-                                <rect key="frame" x="16" y="371" width="308" height="91"/>
+                                <rect key="frame" x="68" y="430" width="256" height="91"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -138,6 +127,18 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IrG-on-SLF">
+                                <rect key="frame" x="130" y="642" width="132" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Correct?" imagePadding="4">
+                                    <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="lQP-UY-lyx"/>
+                                    <action selector="placeConfirmationButtonPressed:" destination="wDW-HF-Evq" eventType="touchUpInside" id="pYw-Vr-2eb"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="iam-Hb-X0b"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -145,7 +146,7 @@
                     <navigationItem key="navigationItem" id="6ZD-7G-oHC"/>
                     <connections>
                         <outlet property="detailsLabel" destination="5pp-1o-nmV" id="ihZ-Ub-kRY"/>
-                        <outlet property="placeConfirmationButton" destination="6Gj-tr-aas" id="A2F-fU-tR8"/>
+                        <outlet property="placeConfirmationButton" destination="IrG-on-SLF" id="vAN-85-QUm"/>
                         <outlet property="placeSelectorView" destination="yVb-xc-AKo" id="fkJ-HC-NBm"/>
                         <outlet property="searchBar" destination="aA8-sC-BxP" id="ndv-ga-Lx8"/>
                         <outlet property="tableView" destination="pev-JU-U19" id="7t7-iq-rWh"/>
@@ -182,28 +183,34 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uSu-bW-3Ot">
-                                <rect key="frame" x="80" y="544" width="234" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <buttonConfiguration key="configuration" style="filled" title="I am happy with the recording."/>
-                                <connections>
-                                    <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="CrR-F2-aiF"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1r-kq-csq">
                                 <rect key="frame" x="201" y="491" width="113" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" image="play.fill" catalog="system" title=" Play"/>
+                                <connections>
+                                    <action selector="playButtonPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="hvt-1F-Xaf"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BS0-vT-ysS">
                                 <rect key="frame" x="80" y="490" width="113" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="waveform.circle.fill" catalog="system" title="  Record"/>
+                                <buttonConfiguration key="configuration" style="filled" image="waveform.circle.fill" catalog="system" title=" Record"/>
                                 <connections>
                                     <action selector="recordPressed:" destination="vVK-vg-oJQ" eventType="touchUpInside" id="Adt-I8-Zak"/>
                                     <action selector="recordPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="I0Z-L9-cNg"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IZX-LR-VLD">
+                                <rect key="frame" x="95" y="642" width="203" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Good Recording?" imagePadding="4">
+                                    <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="3bX-b8-8O8"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -212,7 +219,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="r8G-Lf-vxZ"/>
                     <connections>
-                        <outlet property="happyWithRecordingButton" destination="uSu-bW-3Ot" id="uU4-9J-Uhz"/>
+                        <outlet property="happyWithRecordingButton" destination="IZX-LR-VLD" id="2ZO-Qx-E8b"/>
                         <outlet property="playButton" destination="v1r-kq-csq" id="MKH-7d-0Mk"/>
                         <outlet property="recordButton" destination="BS0-vT-ysS" id="ab3-Np-gw2"/>
                         <outlet property="recordIcon" destination="ZQu-Yw-z6l" id="sek-jn-ie0"/>
@@ -294,6 +301,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrowshape.forward.fill" catalog="system" width="128" height="104"/>
         <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
         <image name="map.circle" catalog="system" width="128" height="123"/>
         <image name="map.circle.fill" catalog="system" width="128" height="123"/>

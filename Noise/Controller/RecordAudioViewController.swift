@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 import AVFoundation
 
 class RecordAudioViewController: UIViewController {
@@ -15,35 +16,72 @@ class RecordAudioViewController: UIViewController {
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var recordView: UIView!
     @IBOutlet weak var happyWithRecordingButton: UIButton!
-    //var audioRecorder: AVAudioRecorder?
-    //var recordingSession: AVAudioSession?
+    
+    var recordingSession: AVAudioSession!
+    var audioRecorder: AVAudioRecorder!
+    var audioPlayer: AVAudioPlayer?
+    var audioFilename: URL?
     
     var placeName: String?
     var placeAddress: String?
     var placeDistance: String?
-    
+    var placeID: String?
+    var userLocation: CLLocation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Set up View Look
         recordView.layer.borderWidth = 5
         recordView.layer.borderColor = UIColor.white.cgColor
         playButton.isEnabled = false
         happyWithRecordingButton.isHidden = true
+        
+        // Set up Recording
+        recordingSession = AVAudioSession.sharedInstance()
+        
+        do {
+            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setActive(true)
+            recordingSession.requestRecordPermission { granted in
+                        DispatchQueue.main.async {
+                            if granted {
+                                // Permission was granted
+                                print("Recording permission granted")
+                            } else {
+                                // Permission was denied
+                                print("Recording permission denied")
+                                // Here you should inform the user and possibly guide them to the Settings app
+                            }
+                        }
+                    }
+        } catch {
+            // An error occurred when setting up the audio session
+            print("Failed to set up recording session: \(error.localizedDescription)")
+        }
     }
     
 
     @IBAction func recordPressed(_ sender: UIButton) {
         
-        recordIcon.tintColor = UIColor.red
-        print("Recording started...")
+        if audioRecorder == nil {
+                startRecording()
+                print("Recording started...")
+            } else {
+                finishRecording(success: true)
+            }
+    }
+    
+    @IBAction func playButtonPressed(_ sender: UIButton) {
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            self.recordIcon.tintColor = UIColor.blue
-            print("Recording ended.")
-            self.playButton.isEnabled = true
-            self.happyWithRecordingButton.isHidden = false
-        }
+        guard let audioFilename = audioFilename else { return }
+            
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: audioFilename)
+                audioPlayer?.play()
+            } catch {
+                print("Could not load file for playback: \(error.localizedDescription)")
+            }
     }
     
     
@@ -57,21 +95,87 @@ class RecordAudioViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.performSegue(withIdentifier: "recordGo3", sender: self)
         }
-        
-        
     }
     
     
-    /*
-    // MARK: - Navigation
-     
-     
-     
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func startRecording() {
+        audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+        
+        let settings = [
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 12000,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+        
+        do {
+            audioRecorder = try AVAudioRecorder(url: audioFilename!, settings: settings)
+            audioRecorder.delegate = self
+            audioRecorder.record()
+            
+            // Update UI to indicate recording
+            recordIcon.tintColor = UIColor.red
+            
+            // Schedule to stop the recording after 10 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                self.finishRecording(success: true)
+                
+            }
+            
+        } catch {
+            finishRecording(success: false)
+        }
     }
-    */
 
+    func finishRecording(success: Bool) {
+        audioRecorder.stop()
+        audioRecorder = nil
+        
+        // Update UI to indicate not recording and has recorded
+        recordIcon.tintColor = UIColor.blue
+        self.playButton.isEnabled = true
+        self.happyWithRecordingButton.isHidden = false
+        
+        if success {
+            print("Recording finished successfully.")
+        } else {
+            print("Recording failed or was stopped.")
+        }
+    }
+
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+    
+    
+    // Carry over information to the UploadViewController
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+         if segue.identifier == "recordGo3" {
+             if let destinationVC = segue.destination as? UploadViewController {
+                 // Pass data to destinationVC
+                 destinationVC.placeName = placeName
+                 destinationVC.placeAddress = placeAddress
+                 destinationVC.placeDistance = placeDistance
+                 destinationVC.placeID = placeID
+                 destinationVC.userLocation = userLocation
+             }
+         }
+     }
+
+}
+
+
+/*
+ 
+ ---- MARK: Extentions from here on! ----
+ 
+ */
+
+extension RecordAudioViewController: AVAudioRecorderDelegate {
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        if !flag {
+            finishRecording(success: false)
+        }
+    }
 }
