@@ -24,9 +24,13 @@ class RecordAudioViewController: UIViewController {
     
     var placeName: String?
     var placeAddress: String?
+    var placeLon: CLLocationDegrees?
+    var placeLat: CLLocationDegrees?
     var placeDistance: String?
     var placeID: String?
-    var userLocation: CLLocation?
+    var userLocationLon: CLLocationDegrees?
+    var userLocationLat: CLLocationDegrees?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,12 +103,12 @@ class RecordAudioViewController: UIViewController {
     
     
     func startRecording() {
-        audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+        audioFilename = getDocumentsDirectory().appendingPathComponent("\(placeID).m4a")
         
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
+            AVSampleRateKey: 44100,
+            AVNumberOfChannelsKey: 2,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
         
@@ -156,15 +160,18 @@ class RecordAudioViewController: UIViewController {
                  // Pass data to destinationVC
                  destinationVC.placeName = placeName
                  destinationVC.placeAddress = placeAddress
+                 destinationVC.placeLat = placeLat
+                 destinationVC.placeLon = placeLon
                  destinationVC.placeDistance = placeDistance
                  destinationVC.placeID = placeID
-                 destinationVC.userLocation = userLocation
+                 destinationVC.userLocationLat = userLocationLat
+                 destinationVC.userLocationLon = userLocationLon
+                 destinationVC.audioFilename = audioFilename
              }
          }
      }
 
 }
-
 
 /*
  

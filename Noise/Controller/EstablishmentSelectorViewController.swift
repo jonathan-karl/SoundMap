@@ -26,7 +26,11 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     var selectedPlaceName: String?
     var selectedPlaceAddress: String?
     var selectedPlaceDistance: String?
+    var selectedPlaceLon: CLLocationDegrees?
+    var selectedPlaceLat: CLLocationDegrees?
     var selectedPlaceID: String?
+    var userLocationLon: CLLocationDegrees?
+    var userLocationLat: CLLocationDegrees?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -156,6 +160,8 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         //print("Running didUpdateLocations Function")
         if let location = locations.last {
             currentUserLocation = location
+            userLocationLat = currentUserLocation?.coordinate.latitude
+            userLocationLon = currentUserLocation?.coordinate.longitude
         }
     }
     
@@ -195,6 +201,8 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 // Store the details temporarily
                 self.selectedPlaceName = place.name ?? "No Name"
                 self.selectedPlaceAddress = place.formattedAddress ?? "No address"
+                self.selectedPlaceLon = place.coordinate.longitude
+                self.selectedPlaceLat = place.coordinate.latitude
                 self.selectedPlaceDistance = "\(distanceString)km"
                 self.selectedPlaceID = place.placeID
                 
@@ -236,9 +244,12 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                  // Pass data to destinationVC
                  destinationVC.placeName = selectedPlaceName
                  destinationVC.placeAddress = selectedPlaceAddress
+                 destinationVC.placeLon = selectedPlaceLon
+                 destinationVC.placeLat = selectedPlaceLat
                  destinationVC.placeDistance = selectedPlaceDistance
                  destinationVC.placeID = selectedPlaceID
-                 destinationVC.userLocation = currentUserLocation
+                 destinationVC.userLocationLon = userLocationLon
+                 destinationVC.userLocationLat = userLocationLat
              }
          }
      }
