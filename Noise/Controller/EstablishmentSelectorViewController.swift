@@ -75,8 +75,10 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         }
         let filter = GMSAutocompleteFilter()
         filter.types = ["establishment"]
-        // ADD RESTRICTION ON LOCATION BOUNDS. SHOULD BE IN A RADIUS TO THE LOCATION OF 1km
-        //filter.locationRestriction =
+        // ADD RESTRICTION ON LOCATION BOUNDS. SHOULD BE IN A RADIUS TO THE LOCATION OF less than 500m
+        let northEast = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude + 0.005, longitude: userLocation.coordinate.longitude + 0.005)
+        let southWest = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude - 0.005, longitude: userLocation.coordinate.longitude - 0.005)
+        filter.locationRestriction = GMSPlaceRectangularLocationOption(northEast, southWest)
         
         print("Searching for: \(searchText)")
         

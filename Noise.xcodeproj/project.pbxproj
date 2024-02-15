@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */; };
 		AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */; };
 		AB3286202B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv in Resources */ = {isa = PBXBuildFile; fileRef = AB32861F2B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv */; };
+		AB762B822B7C92060078F237 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB762B812B7C92060078F237 /* GoogleService-Info.plist */; };
 		AB8D8E222B7950D30074520B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E212B7950D30074520B /* AppDelegate.swift */; };
 		AB8D8E242B7950D30074520B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E232B7950D30074520B /* SceneDelegate.swift */; };
 		AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E252B7950D30074520B /* MapsViewController.swift */; };
@@ -16,14 +18,18 @@
 		AB8D8E2B2B7950D40074520B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB8D8E2A2B7950D40074520B /* Assets.xcassets */; };
 		AB8D8E2E2B7950D40074520B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB8D8E2C2B7950D40074520B /* LaunchScreen.storyboard */; };
 		AB8D8E382B7952EC0074520B /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E372B7952EC0074520B /* RecordViewController.swift */; };
+		ABA2BCD92B7A010400257211 /* EstablishmentSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */; };
+		ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */; };
 		CBFAA27AD0B114044D357BFB /* Pods_Noise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EFDEE3ECB305CD6F4C65D25 /* Pods_Noise.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1906B586C9DE7C02425F9B49 /* Pods-Noise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Noise.debug.xcconfig"; path = "Target Support Files/Pods-Noise/Pods-Noise.debug.xcconfig"; sourceTree = "<group>"; };
 		8EFDEE3ECB305CD6F4C65D25 /* Pods_Noise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Noise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadViewController.swift; sourceTree = "<group>"; };
 		AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Noise Logo - buffer.jpeg"; path = "Data/Noise Logo - buffer.jpeg"; sourceTree = SOURCE_ROOT; };
-		AB32861F2B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv"; path = "Data/Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv"; sourceTree = SOURCE_ROOT; };
+		AB32861F2B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv */ = {isa = PBXFileReference; lastKnownFileType = text; name = "Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv"; path = "Data/Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv"; sourceTree = SOURCE_ROOT; };
+		AB762B812B7C92060078F237 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		AB8D8E1E2B7950D30074520B /* Noise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Noise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB8D8E212B7950D30074520B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB8D8E232B7950D30074520B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -33,6 +39,8 @@
 		AB8D8E2D2B7950D40074520B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AB8D8E2F2B7950D40074520B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB8D8E372B7952EC0074520B /* RecordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
+		ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstablishmentSelectorViewController.swift; sourceTree = "<group>"; };
+		ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAudioViewController.swift; sourceTree = "<group>"; };
 		D2B8851B115249E51612B43F /* Pods-Noise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Noise.release.xcconfig"; path = "Target Support Files/Pods-Noise/Pods-Noise.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -53,6 +61,9 @@
 			children = (
 				AB8D8E252B7950D30074520B /* MapsViewController.swift */,
 				AB8D8E372B7952EC0074520B /* RecordViewController.swift */,
+				ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */,
+				ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */,
+				AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -87,6 +98,7 @@
 				AB32861F2B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv */,
 				AB8D8E2C2B7950D40074520B /* LaunchScreen.storyboard */,
 				AB8D8E2F2B7950D40074520B /* Info.plist */,
+				AB762B812B7C92060078F237 /* GoogleService-Info.plist */,
 			);
 			path = Noise;
 			sourceTree = "<group>";
@@ -120,6 +132,7 @@
 				AB8D8E1B2B7950D30074520B /* Frameworks */,
 				AB8D8E1C2B7950D30074520B /* Resources */,
 				287A419EB5358339BA6C24F2 /* [CP] Copy Pods Resources */,
+				428E83ADB23519611F56EE85 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -173,6 +186,7 @@
 				AB3286202B796393005D50FC /* Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data.csv in Resources */,
 				AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */,
 				AB8D8E292B7950D30074520B /* Main.storyboard in Resources */,
+				AB762B822B7C92060078F237 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +208,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Noise/Pods-Noise-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		428E83ADB23519611F56EE85 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Noise/Pods-Noise-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Noise/Pods-Noise-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Noise/Pods-Noise-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C5CC422714EF54F20B103F90 /* [CP] Check Pods Manifest.lock */ = {
@@ -225,9 +256,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
+				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
 				AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */,
 				AB8D8E222B7950D30074520B /* AppDelegate.swift in Sources */,
 				AB8D8E242B7950D30074520B /* SceneDelegate.swift in Sources */,
+				ABA2BCD92B7A010400257211 /* EstablishmentSelectorViewController.swift in Sources */,
 				AB8D8E382B7952EC0074520B /* RecordViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,5 +9,9 @@ target 'Noise' do
   pod 'GoogleMaps'
   pod 'Google-Maps-iOS-Utils'
   pod 'GooglePlaces'
+  pod 'Firebase/Core'
+  pod 'FirebaseFirestore'
+  pod 'FirebaseAnalytics'
+  pod 'FirebaseStorage'
 
 end

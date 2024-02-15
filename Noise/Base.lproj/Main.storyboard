@@ -121,7 +121,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please select the Establishment where you want to record a new audio entry." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EzP-9M-l27">
-                                <rect key="frame" x="56" y="204" width="280" height="82"/>
+                                <rect key="frame" x="56" y="200" width="280" height="82"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -166,25 +166,25 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="waveform.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ZQu-Yw-z6l">
-                                <rect key="frame" x="140" y="332" width="113" height="117"/>
+                                <rect key="frame" x="140" y="292" width="113" height="117"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Recording Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="67L-9U-fJw">
-                                <rect key="frame" x="47" y="168" width="299" height="43"/>
+                                <rect key="frame" x="47" y="158" width="299" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="black" pointSize="36"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please hold the phone up in the air a little to get the proper audio and hit record." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Xr-e6-UmZ">
-                                <rect key="frame" x="47" y="205" width="280" height="82"/>
+                                <rect key="frame" x="47" y="198" width="280" height="82"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1r-kq-csq">
-                                <rect key="frame" x="201" y="491" width="113" height="45"/>
+                                <rect key="frame" x="201" y="432" width="113" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" image="play.fill" catalog="system" title=" Play"/>
@@ -193,7 +193,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BS0-vT-ysS">
-                                <rect key="frame" x="80" y="490" width="113" height="45"/>
+                                <rect key="frame" x="80" y="431" width="113" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" image="waveform.circle.fill" catalog="system" title=" Record"/>
@@ -213,12 +213,20 @@
                                     <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="3bX-b8-8O8"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Ho-SS-nHR">
+                                <rect key="frame" x="164" y="293" width="64" height="114"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="95"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="FCa-Dx-s17"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="r8G-Lf-vxZ"/>
                     <connections>
+                        <outlet property="countdownLabel" destination="1Ho-SS-nHR" id="tfZ-SS-BUf"/>
                         <outlet property="happyWithRecordingButton" destination="IZX-LR-VLD" id="2ZO-Qx-E8b"/>
                         <outlet property="playButton" destination="v1r-kq-csq" id="MKH-7d-0Mk"/>
                         <outlet property="recordButton" destination="BS0-vT-ysS" id="ab3-Np-gw2"/>
@@ -317,10 +325,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="arrowshape.forward.fill" catalog="system" width="128" height="104"/>
+        <image name="arrowshape.forward.fill" catalog="system" width="32" height="32"/>
         <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
-        <image name="map.circle" catalog="system" width="128" height="123"/>
-        <image name="map.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="map.circle" catalog="system" width="32" height="32"/>
+        <image name="map.circle.fill" catalog="system" width="32" height="32"/>
         <image name="play.fill" catalog="system" width="117" height="128"/>
         <image name="waveform.circle" catalog="system" width="128" height="123"/>
         <image name="waveform.circle.fill" catalog="system" width="128" height="123"/>

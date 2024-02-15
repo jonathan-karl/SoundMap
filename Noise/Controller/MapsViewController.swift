@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import GoogleMaps
 import GoogleMapsUtils
+import FirebaseFirestore
 
 
 class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
@@ -31,7 +32,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         // Manage the map
         mapView.delegate = self
         // Set the initial camera position
-        let camera = GMSCameraPosition.camera(withLatitude: 0.0, longitude: 0.0, zoom: 3.0)
+        let camera = GMSCameraPosition.camera(withLatitude: 0.0, longitude: 0.0, zoom: 2.0)
         mapView.camera = camera
         
         let iconGenerator = GMUDefaultClusterIconGenerator()
@@ -40,8 +41,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         clusterManager = GMUClusterManager(map: mapView, algorithm: algorithm, renderer: renderer)
         
         // Add the markers to the cluster manager instead of the map directly
-        addMarkersToCluster()
-        print("Markers added.")
+        fetchAndDisplayMarkers()
         
         // Register self to listen to GMSMapViewDelegate events
         clusterManager.setMapDelegate(self)
@@ -90,32 +90,62 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         return false
     }
     
-    
-    func addMarkersToCluster() {
-        guard let path = Bundle.main.path(forResource: "Health Facilities in Kenya - HPV Vaccine- VCF - HPV Vaccine Facility Recommendation Data", ofType: "csv") else { return }
-        let url = URL(fileURLWithPath: path)
-        
-        do {
-            let data = try String(contentsOf: url, encoding: .utf8)
-            let rows = data.components(separatedBy: "\n")
-            
-            for row in rows.dropFirst() {
-                let columns = row.components(separatedBy: ",")
-                if columns.count > 2, let latitude = Double(columns[4]), let longitude = Double(columns[3]) {
+    func fetchAndDisplayMarkers() {
+        let db = Firestore.firestore()
+        db.collection("uploads").getDocuments { [weak self] (querySnapshot, err) in
+            guard let self = self else { return }
+
+            if let err = err {
+                print("Error getting documents: \(err)")
+                return
+            }
+
+            guard let documents = querySnapshot?.documents else {
+                print("No documents or querySnapshot is nil")
+                return
+            }
+
+            var uniqueIds = Set<String>() // To keep track of unique IDs
+
+            for document in documents {
+                let data = document.data()
+                
+                guard let id = data["placeID"] as? String else {
+                    print("ID not found for document: \(document.documentID)")
+                    continue
+                }
+
+                if uniqueIds.contains(id) {
+                    print("Duplicate placeID found: \(id), skipping")
+                    continue
+                }
+                
+                // Now that we've confirmed the id is unique, add it to the set
+                uniqueIds.insert(id)
+                
+                if let latitude = data["placeLat"] as? Double,
+                   let longitude = data["placeLon"] as? Double,
+                   let title = data["placeName"] as? String,
+                   let snippet = data["placeAddress"] as? String {
+                    
+                    // Since the ID is unique, create the marker
                     let marker = GMSMarker()
                     marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    marker.title = columns[2]
-                    marker.snippet = columns[1]
-                    clusterManager.add(marker)
-                    //print("Marker added.")
+                    marker.title = title
+                    marker.snippet = snippet
+                    
+                    // Add the marker to the cluster manager
+                    self.clusterManager.add(marker)
+                } else {
+                    print("Document \(document.documentID) does not contain valid location data.")
                 }
             }
-        } catch {
-            print("Error reading CSV file")
+            
+            // Ensure cluster() is called on the main thread
+            DispatchQueue.main.async {
+                self.clusterManager.cluster()
+            }
         }
     }
-    
-    
-    
 }
 

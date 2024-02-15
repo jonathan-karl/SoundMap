@@ -58,6 +58,7 @@ class UploadViewController: UIViewController {
         }
 
         let storageRef = Storage.storage().reference().child("recordings/\(audioURL.lastPathComponent)")
+        print(storageRef)
         let uploadTask = storageRef.putFile(from: audioURL, metadata: nil)
 
         uploadTask.observe(.progress) { snapshot in
@@ -84,7 +85,7 @@ class UploadViewController: UIViewController {
                 strongSelf.animateUIChanges()
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 print("Returning to Root View Controller")
                 self?.navigationController?.popToRootViewController(animated: true)
             }
