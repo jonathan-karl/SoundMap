@@ -26,6 +26,8 @@ class UploadViewController: UIViewController {
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var audioFilename: URL?
+    var conversationDifficulty: String?
+    var noiseSources: Set<String> = []
     
     
     override func viewDidLoad() {
@@ -41,9 +43,17 @@ class UploadViewController: UIViewController {
         
         // Some print statements to verify data is carried over from the download
         print(placeName!)
+        print(placeAddress!)
+        print(placeID!)
+        print(placeLon!)
+        print(placeLat!)
+        print(placeDistance!)
+        
         print(userLocationLon!)
         print(userLocationLat!)
         print(audioFilename!)
+        print(conversationDifficulty!)
+        print(noiseSources)
         
         uploadProgressView.isHidden = false
         uploadAudioFile()
@@ -60,10 +70,12 @@ class UploadViewController: UIViewController {
         let storageRef = Storage.storage().reference().child("recordings/\(audioURL.lastPathComponent)")
         print(storageRef)
         let uploadTask = storageRef.putFile(from: audioURL, metadata: nil)
+        print(uploadTask)
 
         uploadTask.observe(.progress) { snapshot in
             guard let progress = snapshot.progress else { return }
             let percentComplete = Float(progress.completedUnitCount) / Float(progress.totalUnitCount)
+            print(percentComplete)
             
             DispatchQueue.main.async {
                 self.uploadProgressView.progress = percentComplete
@@ -114,6 +126,9 @@ class UploadViewController: UIViewController {
         let db = Firestore.firestore()
         let currentTimestamp = Timestamp(date: Date())
         
+        // Convert Set to Array
+        let noiseSourcesArray = Array(noiseSources)
+        
         let metadata: [String: Any] = [
             "placeName": placeName ?? "",
             "placeAddress": placeAddress ?? "",
@@ -124,11 +139,13 @@ class UploadViewController: UIViewController {
             "userLocationLat": userLocationLat ?? 0,
             "userLocationLon": userLocationLon ?? 0,
             "uploadTime": currentTimestamp,
+            "conversationDifficulty": conversationDifficulty ?? "",
+            "noiseSources": noiseSourcesArray
             ]
         
         // Add a new document with a generated ID
         var ref: DocumentReference? = nil
-        ref = db.collection("uploads").addDocument(data: metadata) { err in
+        ref = db.collection("uploads/").addDocument(data: metadata) { err in
             if let err = err {
                 print("Error adding document: \(err)")
             } else {

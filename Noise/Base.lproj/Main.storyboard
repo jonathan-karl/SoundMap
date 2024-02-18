@@ -68,6 +68,13 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please enable Noise to access your Location &amp; Microphone if you want to record a new entry." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5pI-dr-icS">
+                                <rect key="frame" x="67" y="536" width="260" height="173"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="22"/>
+                                <color key="textColor" red="0.5568627451" green="0.16078431369999999" blue="0.1450980392" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="gUX-rP-Onz"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -75,9 +82,12 @@
                     <navigationItem key="navigationItem" id="Abl-WR-mvc"/>
                     <connections>
                         <outlet property="detailsLabel" destination="5pp-1o-nmV" id="8sJ-Ff-lnm"/>
-                        <outlet property="recordIcon" destination="ZQu-Yw-z6l" id="OQy-68-msU"/>
+                        <outlet property="promptTextLabel" destination="5cP-7p-uTF" id="n4j-p5-2hO"/>
+                        <outlet property="recordNewEntryGoButton" destination="dCX-SG-8Dv" id="BN0-Xq-nrW"/>
                         <outlet property="searchBar" destination="aA8-sC-BxP" id="hbf-Mw-yo4"/>
                         <outlet property="tableView" destination="pev-JU-U19" id="p9q-mT-iqK"/>
+                        <outlet property="titleLabel" destination="TIq-22-M8a" id="ulY-hC-eh1"/>
+                        <outlet property="warningAccessLabel" destination="5pI-dr-icS" id="Slc-If-sAv"/>
                         <segue destination="wDW-HF-Evq" kind="show" identifier="recordGo" id="kuR-LU-5Kk"/>
                     </connections>
                 </viewController>
@@ -102,26 +112,26 @@
                                 </connections>
                             </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="pev-JU-U19">
-                                <rect key="frame" x="16" y="355" width="361" height="337"/>
+                                <rect key="frame" x="16" y="361" width="361" height="331"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label for Establishment Details" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="5pp-1o-nmV">
-                                <rect key="frame" x="68" y="430" width="256" height="204"/>
+                                <rect key="frame" x="46" y="396" width="290" height="238"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Where are you?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xZK-0h-gTj">
-                                <rect key="frame" x="56" y="158" width="280" height="43"/>
+                                <rect key="frame" x="56" y="138" width="280" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="black" pointSize="36"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please select the Establishment where you want to record a new audio entry." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EzP-9M-l27">
-                                <rect key="frame" x="56" y="200" width="280" height="82"/>
+                                <rect key="frame" x="56" y="176" width="280" height="82"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -165,59 +175,65 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="waveform.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ZQu-Yw-z6l">
-                                <rect key="frame" x="140" y="292" width="113" height="117"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Recording Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="67L-9U-fJw">
-                                <rect key="frame" x="47" y="158" width="299" height="43"/>
+                                <rect key="frame" x="47" y="138" width="299" height="43"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="black" pointSize="36"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please hold the phone up in the air a little to get the proper audio and hit record." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Xr-e6-UmZ">
-                                <rect key="frame" x="47" y="198" width="280" height="82"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="waveform.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="md6-WN-Pc3">
+                                <rect key="frame" x="110" y="281" width="172" height="194"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1rv-e2-FaF">
+                                <rect key="frame" x="200" y="496" width="109" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" image="play.fill" catalog="system" imagePlacement="trailing" title="Play "/>
+                                <connections>
+                                    <action selector="playButtonPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="Noe-zY-SgI"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d5y-m7-oRr">
+                                <rect key="frame" x="83" y="496" width="109" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" image="record.circle" catalog="system" imagePlacement="trailing" title="Record "/>
+                                <connections>
+                                    <action selector="recordPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="1HF-qt-czD"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please hold the phone in the air a little to get a good recording." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jvH-Dr-dRG">
+                                <rect key="frame" x="47" y="186" width="299" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1r-kq-csq">
-                                <rect key="frame" x="201" y="432" width="113" height="45"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="5" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oi-nV-ayy">
+                                <rect key="frame" x="143" y="282" width="107" height="191"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="play.fill" catalog="system" title=" Play"/>
-                                <connections>
-                                    <action selector="playButtonPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="hvt-1F-Xaf"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BS0-vT-ysS">
-                                <rect key="frame" x="80" y="431" width="113" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="waveform.circle.fill" catalog="system" title=" Record"/>
-                                <connections>
-                                    <action selector="recordPressed:" destination="vVK-vg-oJQ" eventType="touchUpInside" id="Adt-I8-Zak"/>
-                                    <action selector="recordPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="I0Z-L9-cNg"/>
-                                </connections>
-                            </button>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="160"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IZX-LR-VLD">
-                                <rect key="frame" x="95" y="642" width="203" height="35"/>
+                                <rect key="frame" x="143" y="642" width="105" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Good Recording?" imagePadding="4">
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Next" imagePadding="4">
                                     <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
                                 </buttonConfiguration>
                                 <connections>
                                     <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="3bX-b8-8O8"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Ho-SS-nHR">
-                                <rect key="frame" x="164" y="293" width="64" height="114"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please Enable Microphone Access" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zkp-t1-JA4">
+                                <rect key="frame" x="68" y="574" width="257" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="95"/>
-                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="22"/>
+                                <color key="textColor" red="0.5568627451" green="0.16078431369999999" blue="0.1450980392" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -226,18 +242,100 @@
                     </view>
                     <navigationItem key="navigationItem" id="r8G-Lf-vxZ"/>
                     <connections>
-                        <outlet property="countdownLabel" destination="1Ho-SS-nHR" id="tfZ-SS-BUf"/>
+                        <outlet property="countdownLabel" destination="7Oi-nV-ayy" id="qg6-h9-CGF"/>
                         <outlet property="happyWithRecordingButton" destination="IZX-LR-VLD" id="2ZO-Qx-E8b"/>
-                        <outlet property="playButton" destination="v1r-kq-csq" id="MKH-7d-0Mk"/>
-                        <outlet property="recordButton" destination="BS0-vT-ysS" id="ab3-Np-gw2"/>
-                        <outlet property="recordIcon" destination="ZQu-Yw-z6l" id="sek-jn-ie0"/>
+                        <outlet property="playButton" destination="1rv-e2-FaF" id="17X-Vc-Shq"/>
+                        <outlet property="recordButton" destination="d5y-m7-oRr" id="QtU-6M-OJl"/>
+                        <outlet property="recordIcon" destination="md6-WN-Pc3" id="b6U-lj-pSX"/>
                         <outlet property="recordView" destination="rUD-p1-hnU" id="0Hb-QE-och"/>
-                        <segue destination="xkb-Qc-gMb" kind="show" identifier="recordGo3" id="QWG-3L-8Sd"/>
+                        <outlet property="warningMicAccess" destination="zkp-t1-JA4" id="kGW-sJ-SgD"/>
+                        <segue destination="RLe-2a-r2q" kind="show" identifier="recordGo3" id="rqR-3B-UW8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0lu-nV-QRH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3127.4809160305344" y="736.61971830985919"/>
+        </scene>
+        <!--More Info View Controller-->
+        <scene sceneID="RTg-yL-KaB">
+            <objects>
+                <viewController id="RLe-2a-r2q" customClass="MoreInfoViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Jen-nd-9kH">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="WJO-8P-cny">
+                                <rect key="frame" x="47" y="318" width="290" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Comfortable"/>
+                                    <segment title="Manageable"/>
+                                    <segment title="Challenging"/>
+                                </segments>
+                                <connections>
+                                    <action selector="conversationButtonChanged:" destination="RLe-2a-r2q" eventType="valueChanged" id="tRY-WD-FuX"/>
+                                </connections>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hK6-Lq-jgO">
+                                <rect key="frame" x="144" y="642" width="105" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Next" imagePadding="4">
+                                    <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="T3z-Nc-FGH"/>
+                                    <action selector="nextButtonPressed:" destination="RLe-2a-r2q" eventType="touchUpInside" id="2Nq-26-ARA"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="What else?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N9l-uI-Yhr">
+                                <rect key="frame" x="47" y="135" width="200" height="43"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="36"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Tell us about your experience here" lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="423-HP-dJk">
+                                <rect key="frame" x="47" y="186" width="254" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="jjj-by-Zmi">
+                                <rect key="frame" x="47" y="429" width="290" height="178"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="How do you find listening to others?" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n7F-L4-byL">
+                                <rect key="frame" x="47" y="273" width="318" height="37"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Any specific background noises?" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DZJ-wf-IIk">
+                                <rect key="frame" x="47" y="387" width="318" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="WE5-PP-Ibj"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" leftItemsSupplementBackButton="YES" id="Kvw-Tx-u5N"/>
+                    <connections>
+                        <outlet property="conversationButton" destination="WJO-8P-cny" id="Dav-WK-ELE"/>
+                        <outlet property="nextButton" destination="hK6-Lq-jgO" id="7U5-ZV-YBb"/>
+                        <outlet property="optionsTableView" destination="jjj-by-Zmi" id="12Y-c8-Ybp"/>
+                        <segue destination="xkb-Qc-gMb" kind="show" identifier="recordGo4" id="HjT-G0-HjL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="W0e-3U-ibQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3884.7328244274809" y="735.91549295774655"/>
         </scene>
         <!--Upload View Controller-->
         <scene sceneID="7Ns-ab-Zga">
@@ -283,7 +381,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Xb-LV-gbS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3919.8473282442746" y="736.61971830985919"/>
+            <point key="canvasLocation" x="4660" y="736"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="0LK-u6-45u">
@@ -325,11 +423,12 @@
         </scene>
     </scenes>
     <resources>
-        <image name="arrowshape.forward.fill" catalog="system" width="32" height="32"/>
+        <image name="arrowshape.forward.fill" catalog="system" width="128" height="104"/>
         <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
-        <image name="map.circle" catalog="system" width="32" height="32"/>
-        <image name="map.circle.fill" catalog="system" width="32" height="32"/>
+        <image name="map.circle" catalog="system" width="128" height="123"/>
+        <image name="map.circle.fill" catalog="system" width="128" height="123"/>
         <image name="play.fill" catalog="system" width="117" height="128"/>
+        <image name="record.circle" catalog="system" width="128" height="123"/>
         <image name="waveform.circle" catalog="system" width="128" height="123"/>
         <image name="waveform.circle.fill" catalog="system" width="128" height="123"/>
         <systemColor name="systemBackgroundColor">

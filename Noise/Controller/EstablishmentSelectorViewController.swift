@@ -11,7 +11,7 @@ import GoogleMaps
 import CoreLocation
 
 class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
-
+    
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var detailsLabel: UILabel!
@@ -35,9 +35,6 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        placeSelectorView.layer.borderWidth = 5
-        placeSelectorView.layer.borderColor = UIColor.white.cgColor
-        
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -54,16 +51,16 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         
         detailsLabel.isHidden = true
         placeConfirmationButton.isHidden = true
-
+        
     }
     
     @IBAction func placeConfirmationButtonPressed(_ sender: UIButton) {
         
         placeConfirmationButton.tintColor = UIColor.green
-        placeSelectorView.layer.borderColor = UIColor.green.cgColor
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.performSegue(withIdentifier: "recordGo2", sender: self)
+            self.placeConfirmationButton.tintColor = UIColor.blue
         }
     }
     
@@ -107,7 +104,6 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         placeConfirmationButton.tintColor = UIColor.blue
         tableView.isHidden = false // Show the table view
         tableView.reloadData()
-        placeSelectorView.layer.borderColor = UIColor.white.cgColor
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -139,6 +135,21 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         searchBar.resignFirstResponder() // Dismiss the keyboard
         
+        if let cell = tableView.cellForRow(at: indexPath) {
+            // Change cell background color to blue when selected
+            cell.backgroundColor = UIColor.blue
+            // Optional: Change text color to improve readability against the blue background
+            cell.textLabel?.textColor = UIColor.white
+            cell.detailTextLabel?.textColor = UIColor.white
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                // Change cell background color to blue when selected
+                cell.backgroundColor = UIColor.white
+                // Optional: Change text color to improve readability against the blue background
+                cell.textLabel?.textColor = UIColor.black
+                cell.detailTextLabel?.textColor = UIColor.black
+            }
+        }
         
         if indexPath.row < searchResults.count {
             let prediction = searchResults[indexPath.row]
@@ -155,6 +166,8 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         } else {
             print("Selected index is out of range")
         }
+        
+        
     }
     
     
@@ -236,24 +249,24 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         return attributedString
     }
     
-
+    
     //MARK: - Navigation
-
+    
     // Carry over information
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-         if segue.identifier == "recordGo2" {
-             if let destinationVC = segue.destination as? RecordAudioViewController {
-                 // Pass data to destinationVC
-                 destinationVC.placeName = selectedPlaceName
-                 destinationVC.placeAddress = selectedPlaceAddress
-                 destinationVC.placeLon = selectedPlaceLon
-                 destinationVC.placeLat = selectedPlaceLat
-                 destinationVC.placeDistance = selectedPlaceDistance
-                 destinationVC.placeID = selectedPlaceID
-                 destinationVC.userLocationLon = userLocationLon
-                 destinationVC.userLocationLat = userLocationLat
-             }
-         }
-     }
-
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "recordGo2" {
+            if let destinationVC = segue.destination as? RecordAudioViewController {
+                // Pass data to destinationVC
+                destinationVC.placeName = selectedPlaceName
+                destinationVC.placeAddress = selectedPlaceAddress
+                destinationVC.placeLon = selectedPlaceLon
+                destinationVC.placeLat = selectedPlaceLat
+                destinationVC.placeDistance = selectedPlaceDistance
+                destinationVC.placeID = selectedPlaceID
+                destinationVC.userLocationLon = userLocationLon
+                destinationVC.userLocationLat = userLocationLat
+            }
+        }
+    }
+    
 }

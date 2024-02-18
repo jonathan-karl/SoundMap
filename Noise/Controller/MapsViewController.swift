@@ -22,9 +22,8 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        locationManager = CLLocationManager()
-        
         // Manage the location`
+        locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
         locationManager?.requestWhenInUseAuthorization()
@@ -69,6 +68,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         locationManager?.stopUpdatingLocation() // Stop location updates if you only need it once
+        fetchAndDisplayMarkers()
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -116,7 +116,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 }
 
                 if uniqueIds.contains(id) {
-                    print("Duplicate placeID found: \(id), skipping")
+                    //print("Duplicate placeID found: \(id), skipping")
                     continue
                 }
                 
@@ -125,14 +125,13 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 
                 if let latitude = data["placeLat"] as? Double,
                    let longitude = data["placeLon"] as? Double,
-                   let title = data["placeName"] as? String,
-                   let snippet = data["placeAddress"] as? String {
+                   let title = data["placeName"] as? String {
                     
                     // Since the ID is unique, create the marker
                     let marker = GMSMarker()
                     marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                     marker.title = title
-                    marker.snippet = snippet
+                    marker.snippet = "Conversation Difficulty: Comfortable (24), Manageable (21), Challenging (3)\n\nNoises detected: Kids (7), Music (89)"
                     
                     // Add the marker to the cluster manager
                     self.clusterManager.add(marker)
@@ -145,6 +144,19 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             DispatchQueue.main.async {
                 self.clusterManager.cluster()
             }
+        }
+    }
+    
+    func colorForConversationDifficulty(_ difficulty: String) -> UIColor {
+        switch difficulty {
+        case "Comfortable":
+            return UIColor.green // Example color for "Comfortable"
+        case "Manageable":
+            return UIColor.orange // Example color for "Manageable"
+        case "Challenging":
+            return UIColor.red // Example color for "Challenging"
+        default:
+            return UIColor.gray // Default color if difficulty is unknown
         }
     }
 }

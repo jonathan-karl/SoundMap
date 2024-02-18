@@ -15,8 +15,10 @@ class RecordAudioViewController: UIViewController {
     @IBOutlet weak var countdownLabel: UILabel!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var playButton: UIButton!
-    @IBOutlet weak var recordView: UIView!
     @IBOutlet weak var happyWithRecordingButton: UIButton!
+    @IBOutlet weak var recordView: UIView!
+    @IBOutlet weak var warningMicAccess: UILabel!
+    
     
     var recordingSession: AVAudioSession!
     var audioRecorder: AVAudioRecorder!
@@ -39,10 +41,11 @@ class RecordAudioViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Set up View Look
-        recordView.layer.borderWidth = 5
-        recordView.layer.borderColor = UIColor.white.cgColor
+        // Set up the View
+        recordIcon.tintColor = UIColor.blue
+        recordButton.isEnabled = true
         playButton.isEnabled = false
+        warningMicAccess.isHidden = true
         happyWithRecordingButton.isHidden = true
         countdownLabel.isHidden = true
         
@@ -50,7 +53,7 @@ class RecordAudioViewController: UIViewController {
         recordingSession = AVAudioSession.sharedInstance()
         
         do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
             try recordingSession.setActive(true)
             recordingSession.requestRecordPermission { granted in
                 DispatchQueue.main.async {
@@ -60,7 +63,15 @@ class RecordAudioViewController: UIViewController {
                     } else {
                         // Permission was denied
                         print("Recording permission denied")
-                        // Here you should inform the user and possibly guide them to the Settings app
+                        self.recordButton.isEnabled = false
+                        self.recordIcon.tintColor = UIColor.gray
+                        self.warningMicAccess.isHidden = false
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            self.navigationController?.popToRootViewController(animated: true)
+                            // Here you should inform the user and possibly guide them to the Settings app
+                        }
+                        
                     }
                 }
             }
@@ -81,6 +92,7 @@ class RecordAudioViewController: UIViewController {
             // Hide the waveform icon and show the countdownLabel
             recordIcon.isHidden = true
             countdownLabel.isHidden = false
+            playButton.isEnabled = false
             
             // Initialize countdown seconds
             countdownSeconds = 5
@@ -92,6 +104,7 @@ class RecordAudioViewController: UIViewController {
             
         } else {
             finishRecording(success: true)
+            playButton.isEnabled = true
         }
         
     }
@@ -100,6 +113,7 @@ class RecordAudioViewController: UIViewController {
     @IBAction func playButtonPressed(_ sender: UIButton) {
         
         guard let audioFilename = audioFilename else { return }
+        playButton.tintColor = UIColor.green
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: audioFilename)
@@ -107,19 +121,27 @@ class RecordAudioViewController: UIViewController {
         } catch {
             print("Could not load file for playback: \(error.localizedDescription)")
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.playButton.tintColor = UIColor.blue
+        }
+        
     }
     
     
     @IBAction func happyWithRecordingPressing(_ sender: UIButton) {
         
         happyWithRecordingButton.tintColor = UIColor.green
-        recordView.layer.borderColor = UIColor.green.cgColor
         recordButton.isEnabled = false
         playButton.isEnabled = false
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.performSegue(withIdentifier: "recordGo3", sender: self)
+            self.recordButton.isEnabled = true
+            self.playButton.isEnabled = true
+            self.happyWithRecordingButton.tintColor = UIColor.blue
         }
+        
     }
     
     
@@ -156,6 +178,8 @@ class RecordAudioViewController: UIViewController {
             
             // Update UI to indicate recording
             recordIcon.tintColor = UIColor.red
+            recordButton.tintColor = UIColor.red
+            happyWithRecordingButton.isEnabled = false
             
             // Schedule to stop the recording after X seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
@@ -169,15 +193,18 @@ class RecordAudioViewController: UIViewController {
     }
     
     func finishRecording(success: Bool) {
-        audioRecorder.stop()
+        audioRecorder?.stop()
         audioRecorder = nil
         
         // Update UI to indicate not recording and has recorded
         recordIcon.tintColor = UIColor.blue
         playButton.isEnabled = true
         happyWithRecordingButton.isHidden = false
+        happyWithRecordingButton.isEnabled = true
         recordIcon.isHidden = false
         countdownLabel.isHidden = true
+        countdownLabel.isHidden = true
+        recordButton.tintColor = UIColor.blue
         
         // Stop the timer if it's still running
         countdownTimer?.invalidate()
@@ -200,7 +227,7 @@ class RecordAudioViewController: UIViewController {
     // Carry over information to the UploadViewController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "recordGo3" {
-            if let destinationVC = segue.destination as? UploadViewController {
+            if let destinationVC = segue.destination as? MoreInfoViewController {
                 // Pass data to destinationVC
                 destinationVC.placeName = placeName
                 destinationVC.placeAddress = placeAddress
@@ -214,7 +241,6 @@ class RecordAudioViewController: UIViewController {
             }
         }
     }
-    
 }
 
 /*
@@ -230,3 +256,5 @@ extension RecordAudioViewController: AVAudioRecorderDelegate {
         }
     }
 }
+
+
