@@ -48,7 +48,7 @@ class RecordViewController: UIViewController, CLLocationManagerDelegate
         // If recording permission is not granted, the UI will be updated accordingly
         // in the checkRecordingPermission() method.
     }
-
+    
     
     @IBAction func recordNewEntryGoPressed(_ sender: UIButton) {
         // Optionally, perform any checks or preparations here
@@ -115,5 +115,5 @@ class RecordViewController: UIViewController, CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkLocationPermission()
     }
-    
 }
+

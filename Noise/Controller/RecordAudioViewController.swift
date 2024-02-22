@@ -8,25 +8,21 @@
 import UIKit
 import CoreLocation
 import AVFoundation
+import FirebaseFirestore
 
-class RecordAudioViewController: UIViewController {
+
+class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
     
-    @IBOutlet weak var recordIcon: UIImageView!
-    @IBOutlet weak var countdownLabel: UILabel!
-    @IBOutlet weak var recordButton: UIButton!
-    @IBOutlet weak var playButton: UIButton!
-    @IBOutlet weak var happyWithRecordingButton: UIButton!
+    @IBOutlet weak var decibelLabel: UILabel!
+    @IBOutlet weak var recordDBButton: UIButton!
     @IBOutlet weak var recordView: UIView!
     @IBOutlet weak var warningMicAccess: UILabel!
     
-    
     var recordingSession: AVAudioSession!
     var audioRecorder: AVAudioRecorder!
-    var audioPlayer: AVAudioPlayer?
     var audioFilename: URL?
-    
-    var countdownTimer: Timer?
-    var countdownSeconds = 5
+    var isMonitoring = false // Track whether we are currently monitoring
+    var updateTimer: Timer? // Timer for updating the decibel levels
     
     var placeName: String?
     var placeAddress: String?
@@ -36,193 +32,116 @@ class RecordAudioViewController: UIViewController {
     var placeID: String?
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
-    
+    var currentTimestamp = Timestamp(date: Date())
+    var currentNoiseLevel: Float?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Set up the View
-        recordIcon.tintColor = UIColor.blue
-        recordButton.isEnabled = true
-        playButton.isEnabled = false
         warningMicAccess.isHidden = true
-        happyWithRecordingButton.isHidden = true
-        countdownLabel.isHidden = true
         
-        // Set up Recording
+        // Set up the recording session immediately
+        setupRecordingSession()
+    }
+    
+    
+    @IBAction func recordDBPressed(_ sender: UIButton) {
+        if isMonitoring {
+            stopMonitoring()
+        } else {
+            startMonitoring()
+        }
+        isMonitoring = !isMonitoring // Toggle the monitoring state
+        
+        recordDBButton.tintColor = UIColor.green
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.performSegue(withIdentifier: "recordGo3", sender: self)
+            self.recordDBButton.tintColor = UIColor.blue
+        }
+    }
+    
+    
+    func setupRecordingSession() {
         recordingSession = AVAudioSession.sharedInstance()
-        
         do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+            try recordingSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
             try recordingSession.setActive(true)
-            recordingSession.requestRecordPermission { granted in
+            recordingSession.requestRecordPermission { [unowned self] granted in
                 DispatchQueue.main.async {
                     if granted {
-                        // Permission was granted
-                        print("Recording permission granted")
+                        self.startMonitoring() // Start monitoring immediately if permission is granted
                     } else {
                         // Permission was denied
-                        print("Recording permission denied")
-                        self.recordButton.isEnabled = false
-                        self.recordIcon.tintColor = UIColor.gray
                         self.warningMicAccess.isHidden = false
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            self.navigationController?.popToRootViewController(animated: true)
-                            // Here you should inform the user and possibly guide them to the Settings app
-                        }
-                        
                     }
                 }
             }
         } catch {
-            // An error occurred when setting up the audio session
             print("Failed to set up recording session: \(error.localizedDescription)")
         }
     }
     
-    
-    @IBAction func recordPressed(_ sender: UIButton) {
-        
-        // Start recording
-        if audioRecorder == nil {
-            startRecording()
-            print("Recording started...")
-            
-            // Hide the waveform icon and show the countdownLabel
-            recordIcon.isHidden = true
-            countdownLabel.isHidden = false
-            playButton.isEnabled = false
-            
-            // Initialize countdown seconds
-            countdownSeconds = 5
-            countdownLabel.text = String(countdownSeconds)
-            
-            // Start the countdown timer
-            countdownTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateCountdown), userInfo: nil, repeats: true)
-            
-            
-        } else {
-            finishRecording(success: true)
-            playButton.isEnabled = true
-        }
-        
-    }
-    
-    
-    @IBAction func playButtonPressed(_ sender: UIButton) {
-        
-        guard let audioFilename = audioFilename else { return }
-        playButton.tintColor = UIColor.green
-        
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: audioFilename)
-            audioPlayer?.play()
-        } catch {
-            print("Could not load file for playback: \(error.localizedDescription)")
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            self.playButton.tintColor = UIColor.blue
-        }
-        
-    }
-    
-    
-    @IBAction func happyWithRecordingPressing(_ sender: UIButton) {
-        
-        happyWithRecordingButton.tintColor = UIColor.green
-        recordButton.isEnabled = false
-        playButton.isEnabled = false
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.performSegue(withIdentifier: "recordGo3", sender: self)
-            self.recordButton.isEnabled = true
-            self.playButton.isEnabled = true
-            self.happyWithRecordingButton.tintColor = UIColor.blue
-        }
-        
-    }
-    
-    
-    @objc func updateCountdown() {
-        countdownSeconds -= 1
-        countdownLabel.text = String(countdownSeconds)
-        
-        if countdownSeconds <= 0 {
-            // Stop the timer
-            countdownTimer?.invalidate()
-            countdownTimer = nil
-            
-            // Show the waveform icon again
-            recordIcon.isHidden = false
-            countdownLabel.isHidden = true
-        }
-    }
-    
-    
-    func startRecording() {
-        audioFilename = getDocumentsDirectory().appendingPathComponent("\(placeID!).m4a")
-        
+    func startMonitoring() {
+        let audioFilename = getDocumentsDirectory().appendingPathComponent("temp.m4a")
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 44100,
-            AVNumberOfChannelsKey: 2,
+            AVSampleRateKey: 12000,
+            AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
         
         do {
-            audioRecorder = try AVAudioRecorder(url: audioFilename!, settings: settings)
+            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
             audioRecorder.delegate = self
+            audioRecorder.isMeteringEnabled = true
             audioRecorder.record()
-            
-            // Update UI to indicate recording
-            recordIcon.tintColor = UIColor.red
-            recordButton.tintColor = UIColor.red
-            happyWithRecordingButton.isEnabled = false
-            
-            // Schedule to stop the recording after X seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                self.finishRecording(success: true)
-                
-            }
-            
+            decibelLabel.isHidden = false // Always show the decibel level
+            startDecibelLevelUpdates()
         } catch {
-            finishRecording(success: false)
+            print("Monitoring failed to start")
         }
     }
     
-    func finishRecording(success: Bool) {
+    func stopMonitoring() {
         audioRecorder?.stop()
         audioRecorder = nil
-        
-        // Update UI to indicate not recording and has recorded
-        recordIcon.tintColor = UIColor.blue
-        playButton.isEnabled = true
-        happyWithRecordingButton.isHidden = false
-        happyWithRecordingButton.isEnabled = true
-        recordIcon.isHidden = false
-        countdownLabel.isHidden = true
-        countdownLabel.isHidden = true
-        recordButton.tintColor = UIColor.blue
-        
-        // Stop the timer if it's still running
-        countdownTimer?.invalidate()
-        countdownTimer = nil
-        
-        
-        if success {
-            print("Recording finished successfully.")
-        } else {
-            print("Recording failed or was stopped.")
-        }
+        updateTimer?.invalidate() // Invalidate the timer to stop updating the decibel levels
+        updateTimer = nil // Set the timer to nil
     }
     
+    func startDecibelLevelUpdates() {
+        updateTimer?.invalidate() // Ensure any existing timer is stopped before creating a new one
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+            guard let strongSelf = self, let recorder = strongSelf.audioRecorder else {
+                timer.invalidate()
+                return
+            }
+            recorder.updateMeters()
+            let decibelLevel = recorder.averagePower(forChannel: 0)
+            // Convert to decibel
+            let db = decibelLevel + 105 // Adjusted formula to convert to dB value
+            strongSelf.currentNoiseLevel = db
+            
+            DispatchQueue.main.async {
+                strongSelf.decibelLabel.text = String(format: "%.0fdB", db)
+                // Adjust the color based on the decibel level
+                if db < 70 {
+                    strongSelf.decibelLabel.textColor = UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) // Green
+                } else if db >= 70 && db <= 100 {
+                    strongSelf.decibelLabel.textColor = UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) // Yellow
+                } else if db > 100 {
+                    strongSelf.decibelLabel.textColor = UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) // Red
+                }
+            }
+        }
+    }
+
     func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
     }
-    
     
     // Carry over information to the UploadViewController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -238,6 +157,8 @@ class RecordAudioViewController: UIViewController {
                 destinationVC.userLocationLat = userLocationLat
                 destinationVC.userLocationLon = userLocationLon
                 destinationVC.audioFilename = audioFilename
+                destinationVC.currentTimestamp = currentTimestamp
+                destinationVC.currentNoiseLevel = currentNoiseLevel
             }
         }
     }
@@ -248,13 +169,3 @@ class RecordAudioViewController: UIViewController {
  ---- MARK: Extentions from here on! ----
  
  */
-
-extension RecordAudioViewController: AVAudioRecorderDelegate {
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-        if !flag {
-            finishRecording(success: false)
-        }
-    }
-}
-
-

@@ -9,10 +9,9 @@ import UIKit
 import CoreLocation
 import FirebaseCore
 import FirebaseFirestore
-import FirebaseStorage
 
 class UploadViewController: UIViewController {
-
+    
     @IBOutlet weak var thankYouLabel: UILabel!
     @IBOutlet weak var uploadButton: UIButton!
     @IBOutlet weak var uploadProgressView: UIProgressView!
@@ -28,80 +27,83 @@ class UploadViewController: UIViewController {
     var audioFilename: URL?
     var conversationDifficulty: String?
     var noiseSources: Set<String> = []
-    
+    var currentTimestamp: Timestamp?
+    var currentNoiseLevel: Float?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        uploadProgressView.progress = 0.0 // Initialize with 0 progress
+        
         uploadProgressView.isHidden = true
         thankYouLabel.isHidden = true
     }
     
-
+    
     @IBAction func uploadPressed(_ sender: UIButton) {
         
-        // Some print statements to verify data is carried over from the download
-        print(placeName!)
-        print(placeAddress!)
-        print(placeID!)
-        print(placeLon!)
-        print(placeLat!)
-        print(placeDistance!)
-        
-        print(userLocationLon!)
-        print(userLocationLat!)
-        print(audioFilename!)
-        print(conversationDifficulty!)
-        print(noiseSources)
-        
         uploadProgressView.isHidden = false
-        uploadAudioFile()
-
+        uploadMetadata()
         
     }
-
-    func uploadAudioFile() {
-        guard let audioURL = audioFilename else {
-            print("Audio filename is nil")
-            return
-        }
-
-        let storageRef = Storage.storage().reference().child("recordings/\(audioURL.lastPathComponent)")
-        print(storageRef)
-        let uploadTask = storageRef.putFile(from: audioURL, metadata: nil)
-        print(uploadTask)
-
-        uploadTask.observe(.progress) { snapshot in
-            guard let progress = snapshot.progress else { return }
-            let percentComplete = Float(progress.completedUnitCount) / Float(progress.totalUnitCount)
-            print(percentComplete)
-            
-            DispatchQueue.main.async {
-                self.uploadProgressView.progress = percentComplete
+    
+    func uploadMetadata() {
+        print("Trying to upload Metadata.")
+        
+        // Show and initialize the progress view
+        uploadProgressView.isHidden = false
+        uploadProgressView.progress = 0.0
+        
+        let db = Firestore.firestore()
+        let noiseSourcesArray = Array(noiseSources)
+        
+        let metadata: [String: Any] = [
+            "placeName": placeName ?? "",
+            "placeAddress": placeAddress ?? "",
+            "placeLon": placeLon ?? 0,
+            "placeLat": placeLat ?? 0,
+            "placeDistance": placeDistance ?? "",
+            "placeID": placeID ?? "",
+            "userLocationLat": userLocationLat ?? 0,
+            "userLocationLon": userLocationLon ?? 0,
+            "uploadTime": currentTimestamp ?? Timestamp(date: Date()),
+            "currentNoiseLevel": currentNoiseLevel ?? 0,
+            "conversationDifficulty": conversationDifficulty ?? "",
+            "noiseSources": noiseSourcesArray
+        ]
+        
+        // Define a flag to control the progress view's completion
+        var uploadCompleted = false
+        
+        // Start uploading metadata to Firestore
+        db.collection("uploads").addDocument(data: metadata) { [weak self] err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                print("Metadata successfully uploaded")
+                uploadCompleted = true
+                DispatchQueue.main.async {
+                    self?.uploadProgressView.progress = 1.0
+                    // Trigger UI changes after a brief moment to show completion
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self?.animateUIChanges()
+                    }
+                }
             }
         }
         
-        uploadTask.observe(.success) { [weak self] _ in
-            guard let strongSelf = self else { return }
+        // Simulate progress
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
+            guard let weakSelf = self else { return }
             
-            storageRef.downloadURL { url, error in
-                if let downloadURL = url {
-                    strongSelf.uploadMetadata(audioURL: downloadURL.absoluteString)
-                } else {
-                    print("Error retrieving download URL: \(error?.localizedDescription ?? "Unknown error")")
-                }
+            // Adjust this value as needed to stop the progress just before 100%
+            let maxProgressBeforeCompletion: Float = 0.95
+            
+            if weakSelf.uploadProgressView.progress >= maxProgressBeforeCompletion && !uploadCompleted {
+                // If the progress reaches the cap and the upload hasn't completed, stop the timer.
+                timer.invalidate()
+            } else if weakSelf.uploadProgressView.progress < maxProgressBeforeCompletion {
+                // Safely increment the progress without completing it
+                weakSelf.uploadProgressView.progress += 0.05
             }
-            
-            DispatchQueue.main.async {
-                strongSelf.animateUIChanges()
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                print("Returning to Root View Controller")
-                self?.navigationController?.popToRootViewController(animated: true)
-            }
-            
         }
     }
     
@@ -119,51 +121,14 @@ class UploadViewController: UIViewController {
                 self.thankYouLabel.alpha = 1
             }
         }
-    }
-    
-    func uploadMetadata(audioURL: String) {
-        // Assume we're using Firestore
-        let db = Firestore.firestore()
-        let currentTimestamp = Timestamp(date: Date())
         
-        // Convert Set to Array
-        let noiseSourcesArray = Array(noiseSources)
-        
-        let metadata: [String: Any] = [
-            "placeName": placeName ?? "",
-            "placeAddress": placeAddress ?? "",
-            "placeLon": placeLon ?? 0,
-            "placeLat": placeLat ?? 0,
-            "placeDistance": placeDistance ?? "",
-            "placeID": placeID ?? "",
-            "userLocationLat": userLocationLat ?? 0,
-            "userLocationLon": userLocationLon ?? 0,
-            "uploadTime": currentTimestamp,
-            "conversationDifficulty": conversationDifficulty ?? "",
-            "noiseSources": noiseSourcesArray
-            ]
-        
-        // Add a new document with a generated ID
-        var ref: DocumentReference? = nil
-        ref = db.collection("uploads/").addDocument(data: metadata) { err in
-            if let err = err {
-                print("Error adding document: \(err)")
-            } else {
-                print("Document added with ID: \(ref!.documentID)")
-                // Here you can handle the successful upload and navigate the user
-                self.navigateAfterUpload()
-            }
-        }
-    }
-
-    func navigateAfterUpload() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             print("Returning to Root View Controller")
             self.navigationController?.popToRootViewController(animated: true)
         }
     }
-
-
+    
+    
     
     
 }

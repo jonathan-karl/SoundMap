@@ -92,21 +92,21 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     
     func fetchAndDisplayMarkers() {
         let db = Firestore.firestore()
-        db.collection("uploads").getDocuments { [weak self] (querySnapshot, err) in
+        db.collection("outputs").getDocuments { [weak self] (querySnapshot, err) in
             guard let self = self else { return }
-
+            
             if let err = err {
                 print("Error getting documents: \(err)")
                 return
             }
-
+            
             guard let documents = querySnapshot?.documents else {
                 print("No documents or querySnapshot is nil")
                 return
             }
-
+            
             var uniqueIds = Set<String>() // To keep track of unique IDs
-
+            
             for document in documents {
                 let data = document.data()
                 
@@ -114,7 +114,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                     print("ID not found for document: \(document.documentID)")
                     continue
                 }
-
+                
                 if uniqueIds.contains(id) {
                     //print("Duplicate placeID found: \(id), skipping")
                     continue
@@ -125,13 +125,24 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 
                 if let latitude = data["placeLat"] as? Double,
                    let longitude = data["placeLon"] as? Double,
-                   let title = data["placeName"] as? String {
+                   let title = data["placeName"] as? String,
+                   let conversationDifficultyOutput = data["conversationDifficultyOutput"] as? String,
+                   let noiseSourcesOutput = data["noiseSourcesOutput"] as? String,
+                   let WIP = data["WIP"] as? String {
                     
                     // Since the ID is unique, create the marker
                     let marker = GMSMarker()
                     marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                     marker.title = title
-                    marker.snippet = "Conversation Difficulty: Comfortable (24), Manageable (21), Challenging (3)\n\nNoises detected: Kids (7), Music (89)"
+                    
+                    // Snippet
+                    if WIP == "Noise data processing..." {
+                        let snippet = WIP
+                        marker.snippet = snippet
+                    } else {
+                        let snippet = "Conversation Difficulty: \(conversationDifficultyOutput) \nNoises detected: \(noiseSourcesOutput)"
+                        marker.snippet = snippet
+                    }
                     
                     // Add the marker to the cluster manager
                     self.clusterManager.add(marker)

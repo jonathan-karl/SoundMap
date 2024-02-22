@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreLocation
+import FirebaseFirestore
 
 class MoreInfoViewController: UIViewController {
 
@@ -23,6 +24,8 @@ class MoreInfoViewController: UIViewController {
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var audioFilename: URL?
+    var currentTimestamp: Timestamp?
+    var currentNoiseLevel: Float?
 
     let conversationButtonOptions = ["Comfortable", "Manageable", "Challenging"]
     var conversationDifficulty: String?
@@ -120,6 +123,8 @@ class MoreInfoViewController: UIViewController {
                  destinationVC.audioFilename = audioFilename
                  destinationVC.conversationDifficulty = conversationDifficulty
                  destinationVC.noiseSources = noiseSources
+                 destinationVC.currentTimestamp = currentTimestamp
+                 destinationVC.currentNoiseLevel = currentNoiseLevel
              }
          }
      }

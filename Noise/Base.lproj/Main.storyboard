@@ -9,6 +9,47 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--View Controller-->
+        <scene sceneID="q4U-dW-xXq">
+            <objects>
+                <viewController id="lC4-1K-tjN" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="cZ4-dI-SLM">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Im Apfelgarten" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kBw-b2-9Ry">
+                                <rect key="frame" x="16" y="107" width="227" height="36"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="30"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Haus 86, 25938 Oldsum, Germany" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" showsExpansionTextWhenTruncated="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i3T-1c-3D5">
+                                <rect key="frame" x="16" y="151" width="326" height="75"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="light" pointSize="21"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hpQ-tX-ZUl">
+                                <rect key="frame" x="16" y="335" width="361" height="133"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <string key="text">Conversation Level Difficulty: Distribution during time of day (decibel integrated)
+
+Noises Detected: a, b, c (visual maybe)</string>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="9CA-h9-mRH"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Oam-c9-ShP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1243.5114503816794" y="736.61971830985919"/>
+        </scene>
         <!--Maps-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -182,28 +223,6 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="waveform.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="md6-WN-Pc3">
-                                <rect key="frame" x="110" y="281" width="172" height="194"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1rv-e2-FaF">
-                                <rect key="frame" x="200" y="496" width="109" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="play.fill" catalog="system" imagePlacement="trailing" title="Play "/>
-                                <connections>
-                                    <action selector="playButtonPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="Noe-zY-SgI"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d5y-m7-oRr">
-                                <rect key="frame" x="83" y="496" width="109" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" image="record.circle" catalog="system" imagePlacement="trailing" title="Record "/>
-                                <connections>
-                                    <action selector="recordPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="1HF-qt-czD"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please hold the phone in the air a little to get a good recording." lineBreakMode="tailTruncation" numberOfLines="6" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jvH-Dr-dRG">
                                 <rect key="frame" x="47" y="186" width="299" height="49"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -211,29 +230,29 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="5" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Oi-nV-ayy">
-                                <rect key="frame" x="143" y="282" width="107" height="191"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="160"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IZX-LR-VLD">
-                                <rect key="frame" x="143" y="642" width="105" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.forward.fill" catalog="system" imagePlacement="trailing" title="Next" imagePadding="4">
-                                    <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="happyWithRecordingPressing:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="3bX-b8-8O8"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Please Enable Microphone Access" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zkp-t1-JA4">
-                                <rect key="frame" x="68" y="574" width="257" height="69"/>
+                                <rect key="frame" x="68" y="507" width="257" height="69"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" weight="black" pointSize="22"/>
                                 <color key="textColor" red="0.5568627451" green="0.16078431369999999" blue="0.1450980392" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Thb-zu-sau">
+                                <rect key="frame" x="125" y="642" width="143" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.right.fill" catalog="system" imagePlacement="trailing" title="Record dB ">
+                                    <fontDescription key="titleFontDescription" type="system" weight="black" pointSize="17"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="recordDBPressed:" destination="jH3-Mn-g6D" eventType="touchUpInside" id="z0b-LX-lTh"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="??dB" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IY3-q5-fCS">
+                                <rect key="frame" x="74" y="366" width="245" height="120"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="100"/>
+                                <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -242,11 +261,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="r8G-Lf-vxZ"/>
                     <connections>
-                        <outlet property="countdownLabel" destination="7Oi-nV-ayy" id="qg6-h9-CGF"/>
-                        <outlet property="happyWithRecordingButton" destination="IZX-LR-VLD" id="2ZO-Qx-E8b"/>
-                        <outlet property="playButton" destination="1rv-e2-FaF" id="17X-Vc-Shq"/>
-                        <outlet property="recordButton" destination="d5y-m7-oRr" id="QtU-6M-OJl"/>
-                        <outlet property="recordIcon" destination="md6-WN-Pc3" id="b6U-lj-pSX"/>
+                        <outlet property="decibelLabel" destination="IY3-q5-fCS" id="24V-JD-Owl"/>
+                        <outlet property="recordDBButton" destination="Thb-zu-sau" id="XcK-uo-ChJ"/>
                         <outlet property="recordView" destination="rUD-p1-hnU" id="0Hb-QE-och"/>
                         <outlet property="warningMicAccess" destination="zkp-t1-JA4" id="kGW-sJ-SgD"/>
                         <segue destination="RLe-2a-r2q" kind="show" identifier="recordGo3" id="rqR-3B-UW8"/>
@@ -388,7 +404,7 @@
             <objects>
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="Uoh-6U-shd" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <tabBar key="tabBar" alpha="0.55000000000000004" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="eRH-cJ-V19">
+                    <tabBar key="tabBar" alpha="0.80000000000000004" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="eRH-cJ-V19">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -423,12 +439,11 @@
         </scene>
     </scenes>
     <resources>
-        <image name="arrowshape.forward.fill" catalog="system" width="128" height="104"/>
+        <image name="arrowshape.forward.fill" catalog="system" width="32" height="32"/>
+        <image name="arrowshape.right.fill" catalog="system" width="128" height="104"/>
         <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
-        <image name="map.circle" catalog="system" width="128" height="123"/>
-        <image name="map.circle.fill" catalog="system" width="128" height="123"/>
-        <image name="play.fill" catalog="system" width="117" height="128"/>
-        <image name="record.circle" catalog="system" width="128" height="123"/>
+        <image name="map.circle" catalog="system" width="32" height="32"/>
+        <image name="map.circle.fill" catalog="system" width="32" height="32"/>
         <image name="waveform.circle" catalog="system" width="128" height="123"/>
         <image name="waveform.circle.fill" catalog="system" width="128" height="123"/>
         <systemColor name="systemBackgroundColor">
