@@ -19,6 +19,14 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     var locationManager: CLLocationManager?
     var clusterManager: GMUClusterManager!
     
+    // Temporary storage for details to pass to DetailedViewController
+    var conversationDifficultyElements: Set<String> = []
+    var conversationDifficultyFrequencies: Set<Int> = []
+    var noiseSourcesElements: Set<String> = []
+    var noiseSourcesFrequencies: Set<Int> = []
+    var placeAddress: String?
+    var placeName: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,7 +40,9 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         mapView.delegate = self
         // Set the initial camera position
         let camera = GMSCameraPosition.camera(withLatitude: 0.0, longitude: 0.0, zoom: 2.0)
+        let mapID = GMSMapID(identifier: "9e950bcba4f24a30")
         mapView.camera = camera
+        
         
         let iconGenerator = GMUDefaultClusterIconGenerator()
         let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
@@ -78,19 +88,26 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         // center the map on tapped marker
         mapView.animate(toLocation: marker.position)
+        
         // check if a cluster icon was tapped
         if marker.userData is GMUCluster {
             // zoom in on tapped cluster
             mapView.animate(toZoom: mapView.camera.zoom + 1)
             NSLog("Did tap cluster")
             return true
+        } else {
+            if let _ = marker.userData as? MarkerData {
+                    // Perform the segue and pass marker.userData as sender
+                    self.performSegue(withIdentifier: "seeDetails", sender: marker.userData)
+                }
+            NSLog("Did tap a normal marker")
+            return false // or true based on your handling
         }
-        
-        NSLog("Did tap a normal marker")
-        return false
     }
+
     
     func fetchAndDisplayMarkers() {
+        clusterManager.clearItems() // Clear existing items before adding new ones
         let db = Firestore.firestore()
         db.collection("outputs").getDocuments { [weak self] (querySnapshot, err) in
             guard let self = self else { return }
@@ -122,33 +139,41 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 
                 // Now that we've confirmed the id is unique, add it to the set
                 uniqueIds.insert(id)
-                
+            
                 if let latitude = data["placeLat"] as? Double,
                    let longitude = data["placeLon"] as? Double,
-                   let title = data["placeName"] as? String,
-                   let conversationDifficultyOutput = data["conversationDifficultyOutput"] as? String,
-                   let noiseSourcesOutput = data["noiseSourcesOutput"] as? String,
-                   let WIP = data["WIP"] as? String {
+                   let placeName = data["placeName"] as? String,
+                   let placeAddress = data["placeAddress"] as? String,
+                   let WIP = data["WIP"] as? String,
+                   let conversationDifficultyElementsArray = data["conversationDifficultyElements"] as? [String],
+                   let conversationDifficultyFrequenciesArray = data["conversationDifficultyFrequencies"] as? [Int],
+                   let noiseSourcesElementsArray = data["noiseSourcesElements"] as? [String],
+                   let noiseSourcesFrequenciesArray = data["noiseSourcesFrequencies"] as? [Int] {
+                    
+                    let markerData = MarkerData(
+                        placeName: placeName,
+                        placeAddress: placeAddress,
+                        conversationDifficultyElements: conversationDifficultyElementsArray,
+                        conversationDifficultyFrequencies: conversationDifficultyFrequenciesArray,
+                        noiseSourcesElements: noiseSourcesElementsArray,
+                        noiseSourcesFrequencies: noiseSourcesFrequenciesArray
+                    )
                     
                     // Since the ID is unique, create the marker
                     let marker = GMSMarker()
                     marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    marker.title = title
-                    
-                    // Snippet
-                    if WIP == "Noise data processing..." {
-                        let snippet = WIP
-                        marker.snippet = snippet
-                    } else {
-                        let snippet = "Conversation Difficulty: \(conversationDifficultyOutput) \nNoises detected: \(noiseSourcesOutput)"
-                        marker.snippet = snippet
-                    }
-                    
+                    marker.title = placeName
+                    marker.snippet = WIP
+                    marker.userData = markerData
                     // Add the marker to the cluster manager
                     self.clusterManager.add(marker)
                 } else {
                     print("Document \(document.documentID) does not contain valid location data.")
                 }
+                
+                
+                
+                
             }
             
             // Ensure cluster() is called on the main thread
@@ -158,17 +183,40 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         }
     }
     
-    func colorForConversationDifficulty(_ difficulty: String) -> UIColor {
-        switch difficulty {
-        case "Comfortable":
-            return UIColor.green // Example color for "Comfortable"
-        case "Manageable":
-            return UIColor.orange // Example color for "Manageable"
-        case "Challenging":
-            return UIColor.red // Example color for "Challenging"
-        default:
-            return UIColor.gray // Default color if difficulty is unknown
+    // Carry over information
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "seeDetails",
+           let destinationVC = segue.destination as? DetailedViewController,
+           let markerData = sender as? MarkerData { // Cast sender to MarkerData
+            // Pass data to destinationVC
+            destinationVC.placeName = markerData.placeName
+            destinationVC.placeAddress = markerData.placeAddress
+            destinationVC.conversationDifficultyElements = markerData.conversationDifficultyElements
+            destinationVC.conversationDifficultyFrequencies = markerData.conversationDifficultyFrequencies
+            destinationVC.noiseSourcesElements = markerData.noiseSourcesElements
+            destinationVC.noiseSourcesFrequencies = markerData.noiseSourcesFrequencies
         }
     }
+
+    
 }
 
+
+class MarkerData {
+    var placeName: String
+    var placeAddress: String
+    var conversationDifficultyElements: [String]
+    var conversationDifficultyFrequencies: [Int]
+    var noiseSourcesElements: [String]
+    var noiseSourcesFrequencies: [Int]
+
+    init(placeName: String, placeAddress: String, conversationDifficultyElements: [String], conversationDifficultyFrequencies: [Int], noiseSourcesElements: [String], noiseSourcesFrequencies: [Int]) {
+        self.placeName = placeName
+        self.placeAddress = placeAddress
+        self.conversationDifficultyElements = conversationDifficultyElements
+        self.conversationDifficultyFrequencies = conversationDifficultyFrequencies
+        self.noiseSourcesElements = noiseSourcesElements
+        self.noiseSourcesFrequencies = noiseSourcesFrequencies
+    }
+}

@@ -13,5 +13,6 @@ target 'Noise' do
   pod 'FirebaseFirestore'
   pod 'FirebaseAnalytics'
   pod 'FirebaseStorage'
+  pod 'Charts'
 
 end

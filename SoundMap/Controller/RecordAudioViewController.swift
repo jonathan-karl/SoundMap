@@ -33,6 +33,7 @@ class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var currentTimestamp = Timestamp(date: Date())
+    var decibelLevels: [Float] = [] // Stores recent decibel levels
     var currentNoiseLevel: Float?
     
     override func viewDidLoad() {
@@ -120,18 +121,33 @@ class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
             }
             recorder.updateMeters()
             let decibelLevel = recorder.averagePower(forChannel: 0)
+        
             // Convert to decibel
-            let db = decibelLevel + 105 // Adjusted formula to convert to dB value
-            strongSelf.currentNoiseLevel = db
+            let db = decibelLevel + 110 // Adjusted formula to convert to dB value
+            
+            // Add the new decibel level to the array, and remove the oldest if necessary
+            if strongSelf.decibelLevels.count >= 30 {
+                strongSelf.decibelLevels.removeFirst() // Remove the oldest sample
+            }
+            strongSelf.decibelLevels.append(db)
+            
+            // Calculate the moving average
+            let sum = strongSelf.decibelLevels.reduce(0, +)
+            let movingAverage = sum / Float(strongSelf.decibelLevels.count)
+            
+            strongSelf.currentNoiseLevel = movingAverage // Assign the moving average to currentNoiseLevel
+            print(movingAverage)
             
             DispatchQueue.main.async {
                 strongSelf.decibelLabel.text = String(format: "%.0fdB", db)
                 // Adjust the color based on the decibel level
                 if db < 70 {
                     strongSelf.decibelLabel.textColor = UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) // Green
-                } else if db >= 70 && db <= 100 {
+                } else if db >= 70 && db <= 76 {
                     strongSelf.decibelLabel.textColor = UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) // Yellow
-                } else if db > 100 {
+                } else if db > 76 && db <= 80 {
+                    strongSelf.decibelLabel.textColor = UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) // Orange
+                } else if db > 81 {
                     strongSelf.decibelLabel.textColor = UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) // Red
                 }
             }
