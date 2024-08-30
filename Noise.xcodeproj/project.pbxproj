@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		923C99787B0D824EB9ED328E /* Pods_SoundMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555B85D280A444B6D48FB553 /* Pods_SoundMap.framework */; };
 		AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */; };
+		AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */; };
+		AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */; };
+		AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */; };
 		AB27B3D02B8A6BA300A85BD3 /* DetailedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB27B3CF2B8A6BA300A85BD3 /* DetailedViewController.swift */; };
 		AB2EE0B82C8114F40060121C /* MapStyle.json in Resources */ = {isa = PBXBuildFile; fileRef = AB2EE0B72C8114F40060121C /* MapStyle.json */; };
 		AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */; };
@@ -18,7 +21,6 @@
 		AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E252B7950D30074520B /* MapsViewController.swift */; };
 		AB8D8E292B7950D30074520B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB8D8E272B7950D30074520B /* Main.storyboard */; };
 		AB8D8E2B2B7950D40074520B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB8D8E2A2B7950D40074520B /* Assets.xcassets */; };
-		AB8D8E2E2B7950D40074520B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB8D8E2C2B7950D40074520B /* LaunchScreen.storyboard */; };
 		AB8D8E382B7952EC0074520B /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8D8E372B7952EC0074520B /* RecordViewController.swift */; };
 		AB9831712B7F8738009DAEC3 /* MoreInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9831702B7F8738009DAEC3 /* MoreInfoViewController.swift */; };
 		ABA2BCD92B7A010400257211 /* EstablishmentSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */; };
@@ -31,6 +33,9 @@
 		555B85D280A444B6D48FB553 /* Pods_SoundMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SoundMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		601B399B44956CBBFA78DD50 /* Pods-SoundMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.debug.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.debug.xcconfig"; sourceTree = "<group>"; };
 		AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadViewController.swift; sourceTree = "<group>"; };
+		AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InfoWindowView.swift; path = /Users/jonathan/Downloads/Noise/SoundMap/Controller/InfoWindowView.swift; sourceTree = "<absolute>"; };
+		AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomeClusterRenderer.swift; sourceTree = "<group>"; };
+		AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLaunchScreen.swift; sourceTree = "<group>"; };
 		AB27B3CF2B8A6BA300A85BD3 /* DetailedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedViewController.swift; sourceTree = "<group>"; };
 		AB2EE0B72C8114F40060121C /* MapStyle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MapStyle.json; sourceTree = "<group>"; };
 		AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Noise Logo - buffer.jpeg"; path = "SoundMap/Assets.xcassets/AppIcon.appiconset/Noise Logo - buffer.jpeg"; sourceTree = SOURCE_ROOT; };
@@ -41,7 +46,6 @@
 		AB8D8E252B7950D30074520B /* MapsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsViewController.swift; sourceTree = "<group>"; };
 		AB8D8E282B7950D30074520B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AB8D8E2A2B7950D40074520B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AB8D8E2D2B7950D40074520B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AB8D8E2F2B7950D40074520B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB8D8E372B7952EC0074520B /* RecordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
 		AB9831702B7F8738009DAEC3 /* MoreInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreInfoViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 			isa = PBXGroup;
 			children = (
 				AB27B3CF2B8A6BA300A85BD3 /* DetailedViewController.swift */,
+				AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */,
+				AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */,
 				AB8D8E252B7950D30074520B /* MapsViewController.swift */,
 				AB8D8E372B7952EC0074520B /* RecordViewController.swift */,
 				ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */,
@@ -99,11 +105,11 @@
 			children = (
 				AB8D8E212B7950D30074520B /* AppDelegate.swift */,
 				AB8D8E232B7950D30074520B /* SceneDelegate.swift */,
+				AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */,
 				AB32861C2B79587C005D50FC /* Controller */,
 				AB8D8E272B7950D30074520B /* Main.storyboard */,
 				AB8D8E2A2B7950D40074520B /* Assets.xcassets */,
 				AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */,
-				AB8D8E2C2B7950D40074520B /* LaunchScreen.storyboard */,
 				AB2EE0B72C8114F40060121C /* MapStyle.json */,
 				AB8D8E2F2B7950D40074520B /* Info.plist */,
 				AB762B812B7C92060078F237 /* GoogleService-Info.plist */,
@@ -191,7 +197,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB8D8E2E2B7950D40074520B /* LaunchScreen.storyboard in Resources */,
 				AB8D8E2B2B7950D40074520B /* Assets.xcassets in Resources */,
 				AB2EE0B82C8114F40060121C /* MapStyle.json in Resources */,
 				AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */,
@@ -268,6 +273,9 @@
 			files = (
 				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
 				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
+				AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */,
+				AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */,
+				AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */,
 				AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */,
 				AB8D8E222B7950D30074520B /* AppDelegate.swift in Sources */,
 				AB8D8E242B7950D30074520B /* SceneDelegate.swift in Sources */,
@@ -287,14 +295,6 @@
 				AB8D8E282B7950D30074520B /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		AB8D8E2C2B7950D40074520B /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				AB8D8E2D2B7950D40074520B /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -437,7 +437,6 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to enable you to locate yourself on the map and ensure each recording is actually from the establishment where the user is.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the  microphone to record audio for your pins.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
@@ -476,7 +475,6 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to enable you to locate yourself on the map and ensure each recording is actually from the establishment where the user is.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the  microphone to record audio for your pins.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
