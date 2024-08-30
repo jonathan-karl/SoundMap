@@ -10,8 +10,7 @@ import GooglePlaces
 import GoogleMaps
 import CoreLocation
 
-class RecordViewController: UIViewController, CLLocationManagerDelegate
-{
+class RecordViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var recordNewEntryGoButton: UIButton!
     @IBOutlet weak var promptTextLabel: UILabel!
@@ -23,94 +22,85 @@ class RecordViewController: UIViewController, CLLocationManagerDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print("RecordViewController viewDidLoad called")
+        
         locationManager = CLLocationManager()
         locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization() // Request location authorization
+        locationManager.requestWhenInUseAuthorization()
         
         // Check recording permission
         checkRecordingPermission()
         
         // Initially disable the button until we know the authorization status
-        recordNewEntryGoButton.isEnabled = false
+        recordNewEntryGoButton?.isEnabled = false
         
         // Hide the warning label
-        warningAccessLabel.isHidden = true
+        warningAccessLabel?.isHidden = true
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Check recording permission each time the view appears
-        checkRecordingPermission()
-        
-        // No need to call checkLocationPermission() here directly, as it's already called
-        // at the end of checkRecordingPermission() if the recording permission is granted.
-        // If recording permission is not granted, the UI will be updated accordingly
-        // in the checkRecordingPermission() method.
-    }
-    
     
     @IBAction func recordNewEntryGoPressed(_ sender: UIButton) {
-        // Optionally, perform any checks or preparations here
+        print("Record New Entry button pressed")
         self.performSegue(withIdentifier: "recordGo", sender: self)
     }
     
     func checkRecordingPermission() {
+        print("Checking recording permission")
         switch AVAudioSession.sharedInstance().recordPermission {
         case .granted:
-            // Recording permission is granted, proceed to check location permission
+            print("Recording permission granted")
             checkLocationPermission()
         case .denied:
-            // Recording permission is denied, update UI accordingly
+            print("Recording permission denied")
             updateUIForDeniedPermissions()
         case .undetermined:
-            // Request recording permission
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+            print("Recording permission undetermined")
+            AVAudioSession.sharedInstance().requestRecordPermission { [weak self] granted in
                 DispatchQueue.main.async {
                     if granted {
-                        // Permission granted, proceed to check location permission
-                        self.checkLocationPermission()
+                        print("Recording permission granted after request")
+                        self?.checkLocationPermission()
                     } else {
-                        // Permission denied, update UI accordingly
-                        self.updateUIForDeniedPermissions()
+                        print("Recording permission denied after request")
+                        self?.updateUIForDeniedPermissions()
                     }
                 }
             }
         @unknown default:
-            // Handle unexpected case
+            print("Unknown recording permission status")
             updateUIForDeniedPermissions()
         }
     }
     
     func checkLocationPermission() {
+        print("Checking location permission")
         let status = locationManager.authorizationStatus
         switch status {
         case .authorizedWhenInUse, .authorizedAlways:
-            // Location services are authorized, request location
-            // Location permission is granted, enable the button
-            promptTextLabel.textColor = UIColor.black
-            titleLabel.textColor = UIColor.black
-            recordNewEntryGoButton.isEnabled = true
-            warningAccessLabel.isHidden = true
+            print("Location permission granted")
+            promptTextLabel?.textColor = UIColor.black
+            titleLabel?.textColor = UIColor.black
+            recordNewEntryGoButton?.isEnabled = true
+            warningAccessLabel?.isHidden = true
         case .notDetermined:
-            // Request for authorization
+            print("Location permission not determined")
             locationManager?.requestWhenInUseAuthorization()
         case .restricted, .denied:
-            // Location permission is not granted, update UI accordingly
+            print("Location permission denied or restricted")
             updateUIForDeniedPermissions()
-            break
-        default:
+        @unknown default:
+            print("Unknown location permission status")
             break
         }
     }
     
     func updateUIForDeniedPermissions() {
-        // Disable the button and show the warning label
-        recordNewEntryGoButton.isEnabled = false
-        warningAccessLabel.isHidden = false
-        promptTextLabel.textColor = UIColor.lightGray
-        titleLabel.textColor = UIColor.lightGray
+        print("Updating UI for denied permissions")
+        recordNewEntryGoButton?.isEnabled = false
+        warningAccessLabel?.isHidden = false
+        promptTextLabel?.textColor = UIColor.lightGray
+        titleLabel?.textColor = UIColor.lightGray
     }
+    
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkLocationPermission()
