@@ -11,13 +11,19 @@ import GoogleMaps
 import GoogleMapsUtils
 import FirebaseFirestore
 
-
-class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
+class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, GMUClusterManagerDelegate {
     
+    private var customRenderer: CustomClusterRenderer!
+    private var isZoomingToCluster = false
+    private var customInfoWindow: CustomInfoWindow?
+    private var selectedMarker: GMSMarker?
     var locationManager: CLLocationManager?
     var clusterManager: GMUClusterManager!
     var visibleLabels: [GMSMarker: Bool] = [:]
     var markers: [GMSMarker] = []
+    var mapView: GMSMapView!
+    
+    var onTap: (() -> Void)?
     
     // Temporary storage for details to pass to DetailedViewController
     var conversationDifficultyElements: Set<String> = []
@@ -27,58 +33,75 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     var placeAddress: String?
     var placeName: String?
     var placeType: String?
-    var mapView: GMSMapView!
-    
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Manage the location
+        print("Setting up MapsViewController")
+        setupLocationManager()
+        setupMapView()
+        setupClusterManager()
+        
+        // Fetch and display markers
+        fetchAndDisplayMarkers()
+        
+        // Ensure tab bar is visible
+        self.tabBarController?.tabBar.isHidden = false
+        
+        // Check if the tab bar is covered by the map view
+        if let tabBarFrame = self.tabBarController?.tabBar.frame,
+           let mapViewFrame = self.mapView?.frame {
+            print("Tab Bar Frame: \(tabBarFrame)")
+            print("Map View Frame: \(mapViewFrame)")
+        }
+        
+        // Set up tap gesture recognizer
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleMapTap(_:)))
+        mapView.addGestureRecognizer(tapGesture)
+        
+        
+    }
+    
+    private func setupLocationManager() {
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
         locationManager?.requestWhenInUseAuthorization()
-        
-        
-        
+    }
+    
+    private func setupMapView() {
         // Set the initial camera position
         let camera = GMSCameraPosition.camera(withLatitude: 0.0, longitude: 0.0, zoom: 2.0)
         
         // Create the map with the custom map ID and camera
         let mapID = GMSMapID(identifier: "9e950bcba4f24a30")
-        self.mapView = GMSMapView(frame: view.bounds, mapID: mapID, camera: camera)
-        view.addSubview(self.mapView as UIView)
+        mapView = GMSMapView(frame: view.bounds, mapID: mapID, camera: camera)
+        view.addSubview(mapView)
         
         // Set the delegate
-        self.mapView.delegate = self
+        mapView.delegate = self
         
         // Configure the map style to hide default POIs and labels
         do {
             if let styleURL = Bundle.main.url(forResource: "MapStyle", withExtension: "json") {
-                print("Found MapStyle.json at: \(styleURL)")
-                let styleString = try String(contentsOf: styleURL)
-                print("MapStyle contents: \(styleString)")
                 mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleURL)
-                print("Successfully applied map style")
             } else {
                 print("Unable to find MapStyle.json")
             }
         } catch {
             print("Failed to load map style. Error: \(error)")
         }
-        
-        // Initialize cluster manager
+    }
+    
+    private func setupClusterManager() {
+        print("Setting up ClusterManager")
         let iconGenerator = GMUDefaultClusterIconGenerator()
         let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
         let renderer = GMUDefaultClusterRenderer(mapView: mapView, clusterIconGenerator: iconGenerator)
+        
         clusterManager = GMUClusterManager(map: mapView, algorithm: algorithm, renderer: renderer)
-        
-        // Fetch and display markers
-        fetchAndDisplayMarkers()
-        
-        // Register self to listen to GMSMapViewDelegate events
-        clusterManager.setMapDelegate(self)
+        clusterManager.setDelegate(self, mapDelegate: self)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -114,57 +137,189 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         print("Failed to get user location: \(error.localizedDescription)")
     }
     
-    func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+    func clusterManager(_ clusterManager: GMUClusterManager, didTap cluster: GMUCluster) -> Bool {
+        print("Cluster tapped: \(cluster.count) items")
+        let newCamera = GMSCameraPosition.camera(
+            withTarget: cluster.position,
+            zoom: mapView.camera.zoom + 1
+        )
+        let update = GMSCameraUpdate.setCamera(newCamera)
+        mapView.animate(with: update)
+        return true
+    }
+    
+    func clusterManager(_ clusterManager: GMUClusterManager, didTap clusterItem: GMUClusterItem) -> Bool {
+        // Handle individual cluster item taps if needed
+        if let markerData = (clusterItem as? GMSMarker)?.userData as? MarkerData {
+            // Do something with markerData
+            print("Tapped on marker: \(markerData.placeName)")
+        }
+        return true
+    }
+    
+    @objc private func handleTap() {
+        onTap?()
+    }
+    
+    @objc func handleMapTap(_ gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: mapView)
         
-        mapView.selectedMarker = marker
-        // center the map on tapped marker
-        mapView.animate(toLocation: marker.position)
-        
-        // check if a cluster icon was tapped
-        if marker.userData is GMUCluster {
-            // zoom in on tapped cluster
-            mapView.animate(toZoom: mapView.camera.zoom + 1)
-            NSLog("Did tap cluster")
-            return true
+        if let tappedMarker = findMarker(at: point) {
+            showCustomInfoWindow(for: tappedMarker)
         } else {
-            if let _ = marker.userData as? MarkerData {
-                // Perform the segue and pass marker.userData as sender
-                self.performSegue(withIdentifier: "seeDetails", sender: marker.userData)
-            }
-            NSLog("Did tap a normal marker")
-            return false // or true based on your handling
+            hideCustomInfoWindow()
         }
     }
     
-    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
-        let infoWindow = UIView(frame: CGRect(x: 0, y: 0, width: 250, height: 100))
-        infoWindow.backgroundColor = UIColor.white
-        infoWindow.layer.cornerRadius = 10
-        infoWindow.layer.shadowColor = UIColor.black.cgColor
-        infoWindow.layer.shadowOffset = CGSize(width: 0, height: 2)
-        infoWindow.layer.shadowOpacity = 0.2
-        infoWindow.layer.shadowRadius = 4
-        
-        let nameLabel = UILabel(frame: CGRect(x: 10, y: 10, width: 230, height: 40))
-        nameLabel.text = marker.title
-        nameLabel.font = UIFont.boldSystemFont(ofSize: 16)
-        nameLabel.numberOfLines = 0
-        infoWindow.addSubview(nameLabel)
-        
-        let addressLabel = UILabel(frame: CGRect(x: 10, y: 60, width: 230, height: 30))
-        addressLabel.text = marker.snippet
-        addressLabel.font = UIFont.systemFont(ofSize: 12)
-        addressLabel.textColor = .gray
-        addressLabel.numberOfLines = 0
-        infoWindow.addSubview(addressLabel)
-        
-        return infoWindow
+    func findMarker(at point: CGPoint) -> GMSMarker? {
+        for marker in self.markers {
+            let markerPoint = mapView.projection.point(for: marker.position)
+            let frame = CGRect(x: markerPoint.x - 20, y: markerPoint.y - 20, width: 40, height: 40)
+            if frame.contains(point) {
+                return marker
+            }
+        }
+        return nil
     }
     
     
+    func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        if let _ = marker.userData as? GMUCluster {
+            // Let the cluster manager handle cluster taps
+            return false
+        } else if let markerData = marker.userData as? MarkerData {
+            // Handle regular marker taps
+            if marker == selectedMarker {
+                hideCustomInfoWindow()
+            } else {
+                showCustomInfoWindow(for: marker)
+            }
+            return true
+        }
+        return false
+    }
+    
+    func zoomToCluster(_ cluster: GMUCluster) {
+        isZoomingToCluster = true
+        var bounds = GMSCoordinateBounds(coordinate: cluster.position, coordinate: cluster.position)
+        for item in cluster.items {
+            bounds = bounds.includingCoordinate(item.position)
+        }
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+        mapView.animate(with: update)
+        
+        // Reset the flag after a short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.isZoomingToCluster = false
+        }
+    }
+    
+    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
+        hideCustomInfoWindow()
+    }
     
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+        clusterManager.cluster()
         updateVisibleLabels()
+        if let marker = selectedMarker {
+            updateInfoWindowPosition(for: marker)
+        }
+    }
+    
+    private func showCustomInfoWindow(for marker: GMSMarker) {
+        hideCustomInfoWindow()
+        
+        guard let markerData = marker.userData as? MarkerData else {
+            print("Invalid marker data")
+            return
+        }
+        
+        let infoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 250, height: 180))
+        
+        // Calculate the most common conversation difficulty
+        let conversationDifficulties = ["Comfortable": 1, "Manageable": 2, "Challenging": 3]
+        let totalScore = zip(markerData.conversationDifficultyElements, markerData.conversationDifficultyFrequencies)
+            .reduce(0) { $0 + (conversationDifficulties[$1.0] ?? 0) * $1.1 }
+        let totalFrequency = markerData.conversationDifficultyFrequencies.reduce(0, +)
+        let averageScore = Double(totalScore) / Double(totalFrequency)
+        let mostCommonDifficulty: String
+        switch averageScore {
+        case ..<1.5:
+            mostCommonDifficulty = "Comfortable"
+        case 1.5..<2.5:
+            mostCommonDifficulty = "Manageable"
+        default:
+            mostCommonDifficulty = "Challenging"
+        }
+        
+        // Calculate the top 3 noise sources with frequencies
+        let topNoises = zip(markerData.noiseSourcesElements, markerData.noiseSourcesFrequencies)
+            .sorted { $0.1 > $1.1 }
+            .prefix(3)
+            .map { ($0.0, Int(Double($0.1) / Double(markerData.noiseSourcesFrequencies.reduce(0, +)) * 100)) }
+        
+        let venueData = VenueNoiseData(
+            venueName: markerData.placeName,
+            noiseLevel: Int(markerData.averageNoiseLevel),
+            conversationEase: mostCommonDifficulty,
+            topNoises: topNoises
+        )
+        infoWindow.configure(with: venueData)
+        infoWindow.onTap = { [weak self] in
+            self?.performSegue(withIdentifier: "seeDetails", sender: markerData)
+        }
+        
+        mapView.addSubview(infoWindow)
+        customInfoWindow = infoWindow
+        selectedMarker = marker
+        
+        updateInfoWindowPosition(for: marker)
+    }
+    
+    private func updateInfoWindowPosition(for marker: GMSMarker) {
+        guard let infoWindow = customInfoWindow else { return }
+        
+        let markerPoint = mapView.projection.point(for: marker.position)
+        let infoWindowPoint = CGPoint(x: markerPoint.x, y: markerPoint.y - infoWindow.frame.height - 10)
+        infoWindow.center = infoWindowPoint
+    }
+    
+    private func hideCustomInfoWindow() {
+        customInfoWindow?.removeFromSuperview()
+        customInfoWindow = nil
+        selectedMarker = nil
+    }
+    
+    
+    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+        guard let markerData = marker.userData as? MarkerData else {
+            return nil
+        }
+        
+        let customInfoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 250, height: 200))
+        let venueData = VenueNoiseData(
+            venueName: markerData.placeName,
+            noiseLevel: Int(markerData.averageNoiseLevel),
+            conversationEase: markerData.conversationDifficultyElements.first ?? "Unknown",
+            topNoises: zip(markerData.noiseSourcesElements, markerData.noiseSourcesFrequencies)
+                .map { ($0, $1) }
+                .prefix(3)
+                .map { ($0, Int($1)) }
+        )
+        customInfoWindow.configure(with: venueData)
+        
+        // Set up the tap handler for the info window
+        customInfoWindow.onTap = { [weak self] in
+            self?.performSegue(withIdentifier: "seeDetails", sender: markerData)
+        }
+        
+        return customInfoWindow
+    }
+    
+    func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
+        if let markerData = marker.userData as? MarkerData {
+            self.performSegue(withIdentifier: "seeDetails", sender: markerData)
+        }
     }
     
     func updateVisibleLabels() {
@@ -197,13 +352,6 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                     type: markerData.placeType,
                     averageNoiseLevel: markerData.averageNoiseLevel
                 )
-            } else {
-                marker.icon = createCustomMarkerImage(
-                    with: marker.title ?? "",
-                    isVisible: visibleLabels[marker] ?? false,
-                    type: "default",
-                    averageNoiseLevel: 0
-                )
             }
         }
     }
@@ -215,15 +363,14 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         markerView.layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image!
+        return image ?? UIImage()
     }
     
-    
     func createCustomMarkerView(with name: String, isVisible: Bool, type: String, averageNoiseLevel: Double) -> UIView {
-        let markerView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 40))
+        let markerView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 70)) // Reduced height slightly
         
         // Icon
-        let iconView = UIImageView(frame: CGRect(x: 90, y: 20, width: 20, height: 20))
+        let iconView = UIImageView(frame: CGRect(x: 88, y: 46, width: 24, height: 24)) // Adjusted position
         
         // Set the icon based on the type
         switch type {
@@ -241,6 +388,10 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         
         // Set the tint color based on the average noise level
         iconView.tintColor = getColorForNoiseLevel(averageNoiseLevel)
+        // Increase the weight of the icon for better visibility
+        if let config = iconView.image?.withConfiguration(UIImage.SymbolConfiguration(weight: .bold)) {
+            iconView.image = config
+        }
         markerView.addSubview(iconView)
         
         // Text
@@ -252,14 +403,23 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             label.layer.cornerRadius = 10
             label.layer.masksToBounds = true
             label.font = UIFont.boldSystemFont(ofSize: 12)
-            label.sizeToFit()
-            label.frame.size.width += 20 // Add some padding
-            label.center = CGPoint(x: markerView.bounds.width / 2, y: 10)
+            label.numberOfLines = 2 // Allow up to 2 lines
+            label.lineBreakMode = .byTruncatingTail // Truncate with ... if it exceeds 2 lines
+            
+            // Calculate the size of the label based on its content
+            let maxSize = CGSize(width: 180, height: 36) // Max width and slightly reduced max height
+            let size = label.sizeThatFits(maxSize)
+            
+            // Set the frame of the label
+            label.frame = CGRect(x: 0, y: 0, width: size.width + 20, height: min(size.height + 10, 36))
+            label.center = CGPoint(x: markerView.bounds.width / 2, y: 23) // Adjusted y-position
+            
             markerView.addSubview(label)
         }
         
         return markerView
     }
+    
     
     func getColorForNoiseLevel(_ db: Double) -> UIColor {
         switch db {
@@ -291,6 +451,19 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         return image!
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let tabBarHeight = self.tabBarController?.tabBar.frame.height {
+            let mapFrame = CGRect(x: 0,
+                                  y: 0,
+                                  width: view.bounds.width,
+                                  height: view.bounds.height - tabBarHeight)
+            mapView.frame = mapFrame
+        }
+    }
+    
+    // Update fetchAndDisplayMarkers() to use clusterManager.add() instead of creating GMSMarker directly
     func fetchAndDisplayMarkers() {
         clusterManager.clearItems()
         markers.removeAll()
@@ -314,55 +487,44 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             for document in documents {
                 let data = document.data()
                 
-                guard let id = data["placeID"] as? String else {
-                    print("ID not found for document: \(document.documentID)")
+                guard let id = data["placeID"] as? String,
+                      let latitude = data["placeLat"] as? Double,
+                      let longitude = data["placeLon"] as? Double,
+                      let placeName = data["placeName"] as? String,
+                      let placeAddress = data["placeAddress"] as? String,
+                      let averageNoiseLevel = data["averageNoiseLevel"] as? Double else {
                     continue
                 }
                 
-                if uniqueIds.contains(id) {
-                    continue
-                }
-                
+                if uniqueIds.contains(id) { continue }
                 uniqueIds.insert(id)
                 
-                if let latitude = data["placeLat"] as? Double,
-                   let longitude = data["placeLon"] as? Double,
-                   let placeName = data["placeName"] as? String,
-                   let placeAddress = data["placeAddress"] as? String,
-                   let averageNoiseLevel = data["averageNoiseLevel"] as? Double {
-                    
-                    let placeType = data["placeType"] as? String ?? ""
-                    
-                    let markerData = MarkerData(
-                        placeName: placeName,
-                        placeAddress: placeAddress,
-                        placeType: placeType,
-                        averageNoiseLevel: averageNoiseLevel,
-                        conversationDifficultyElements: data["conversationDifficultyElements"] as? [String] ?? [],
-                        conversationDifficultyFrequencies: data["conversationDifficultyFrequencies"] as? [Int] ?? [],
-                        noiseSourcesElements: data["noiseSourcesElements"] as? [String] ?? [],
-                        noiseSourcesFrequencies: data["noiseSourcesFrequencies"] as? [Int] ?? []
-                    )
-                    
-                    let marker = GMSMarker()
-                    marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    marker.title = placeName
-                    marker.snippet = placeAddress
-                    marker.userData = markerData
-                    marker.icon = self.createCustomMarkerImage(
-                        with: placeName,
-                        isVisible: true,
-                        type: placeType,
-                        averageNoiseLevel: averageNoiseLevel
-                    )
-                    marker.groundAnchor = CGPoint(x: 0.5, y: 1)
-                    self.clusterManager.add(marker)
-                    self.markers.append(marker)
-                    
-                } else {
-                    print("Document \(document.documentID) does not contain valid location data.")
-                    print("Missing fields: \(data)")
-                }
+                let placeType = data["placeType"] as? String ?? ""
+                
+                let markerData = MarkerData(
+                    placeName: placeName,
+                    placeAddress: placeAddress,
+                    placeType: placeType,
+                    averageNoiseLevel: averageNoiseLevel,
+                    conversationDifficultyElements: data["conversationDifficultyElements"] as? [String] ?? [],
+                    conversationDifficultyFrequencies: data["conversationDifficultyFrequencies"] as? [Int] ?? [],
+                    noiseSourcesElements: data["noiseSourcesElements"] as? [String] ?? [],
+                    noiseSourcesFrequencies: data["noiseSourcesFrequencies"] as? [Int] ?? []
+                )
+                
+                let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                marker.title = placeName
+                marker.snippet = placeAddress
+                marker.userData = markerData
+                marker.icon = self.createCustomMarkerImage(
+                    with: placeName,
+                    isVisible: true,
+                    type: placeType,
+                    averageNoiseLevel: averageNoiseLevel
+                )
+                marker.groundAnchor = CGPoint(x: 0.5, y: 1)
+                self.clusterManager.add(marker)
+                self.markers.append(marker)
             }
             
             DispatchQueue.main.async {
@@ -372,14 +534,10 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         }
     }
     
-    
-    // Carry over information
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
         if segue.identifier == "seeDetails",
            let destinationVC = segue.destination as? DetailedViewController,
-           let markerData = sender as? MarkerData { // Cast sender to MarkerData
-            // Pass data to destinationVC
+           let markerData = sender as? MarkerData {
             destinationVC.placeName = markerData.placeName
             destinationVC.placeAddress = markerData.placeAddress
             destinationVC.conversationDifficultyElements = markerData.conversationDifficultyElements
@@ -389,7 +547,20 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         }
     }
     
-    
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension MapsViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        // Allow the gesture if the touch is not on the info window
+        if let customInfoWindow = self.customInfoWindow {
+            let location = touch.location(in: mapView)
+            if customInfoWindow.frame.contains(location) {
+                return false
+            }
+        }
+        return true
+    }
 }
 
 
