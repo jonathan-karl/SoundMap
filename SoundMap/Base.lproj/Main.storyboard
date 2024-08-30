@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Uoh-6U-shd">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -11,9 +12,9 @@
         <!--Detailed View Controller-->
         <scene sceneID="q4U-dW-xXq">
             <objects>
-                <viewController id="lC4-1K-tjN" customClass="DetailedViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="lC4-1K-tjN" customClass="DetailedViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="cZ4-dI-SLM">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Im Apfelgarten" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kBw-b2-9Ry">
@@ -47,6 +48,15 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="hb4-LA-rQJ">
+                                <rect key="frame" x="11" y="760" width="361" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Noise Level"/>
+                                    <segment title="Noise Sources"/>
+                                    <segment title="Conversation Difficulty"/>
+                                </segments>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="9CA-h9-mRH"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -65,9 +75,9 @@
         <!--Maps-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="MapsViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="MapsViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="poB-50-YPf" customClass="GMSMapView">
@@ -81,7 +91,6 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Maps" image="map.circle" catalog="system" selectedImage="map.circle.fill" id="M0A-3T-uYw"/>
                     <connections>
-                        <outlet property="mapView" destination="poB-50-YPf" id="iu5-k9-3ZP"/>
                         <segue destination="lC4-1K-tjN" kind="show" identifier="seeDetails" id="5jg-Ag-hCc"/>
                     </connections>
                 </viewController>
@@ -92,9 +101,9 @@
         <!--Record View Controller-->
         <scene sceneID="fCv-5V-3de">
             <objects>
-                <viewController id="vVK-vg-oJQ" customClass="RecordViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="vVK-vg-oJQ" customClass="RecordViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="OvF-4M-H9Y">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Want to record some audio in a cafe, restaurant or bar?" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5cP-7p-uTF">
@@ -152,13 +161,13 @@
         <!--Establishment Selector View Controller-->
         <scene sceneID="qro-HJ-FHV">
             <objects>
-                <viewController id="wDW-HF-Evq" customClass="EstablishmentSelectorViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="wDW-HF-Evq" customClass="EstablishmentSelectorViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yVb-xc-AKo">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <searchBar contentMode="redraw" id="aA8-sC-BxP">
-                                <rect key="frame" x="16" y="311" width="568" height="44"/>
+                                <rect key="frame" x="15" y="311" width="361" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
@@ -224,9 +233,9 @@
         <!--Record Audio View Controller-->
         <scene sceneID="0Dl-1C-A4w">
             <objects>
-                <viewController id="jH3-Mn-g6D" customClass="RecordAudioViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="jH3-Mn-g6D" customClass="RecordAudioViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rUD-p1-hnU">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Recording Audio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="67L-9U-fJw">
@@ -288,9 +297,9 @@
         <!--More Info View Controller-->
         <scene sceneID="RTg-yL-KaB">
             <objects>
-                <viewController id="RLe-2a-r2q" customClass="MoreInfoViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="RLe-2a-r2q" customClass="MoreInfoViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Jen-nd-9kH">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="WJO-8P-cny">
@@ -369,9 +378,9 @@
         <!--Upload View Controller-->
         <scene sceneID="7Ns-ab-Zga">
             <objects>
-                <viewController id="xkb-Qc-gMb" customClass="UploadViewController" customModule="Noise" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="xkb-Qc-gMb" customClass="UploadViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="vD9-Vb-AVx">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s7i-fW-Qbj">
@@ -453,12 +462,12 @@
     </scenes>
     <resources>
         <image name="arrowshape.forward.fill" catalog="system" width="32" height="32"/>
-        <image name="arrowshape.right.fill" catalog="system" width="32" height="32"/>
-        <image name="icloud.and.arrow.up.fill" catalog="system" width="32" height="32"/>
+        <image name="arrowshape.right.fill" catalog="system" width="128" height="104"/>
+        <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
         <image name="map.circle" catalog="system" width="32" height="32"/>
         <image name="map.circle.fill" catalog="system" width="32" height="32"/>
-        <image name="waveform.circle" catalog="system" width="32" height="32"/>
-        <image name="waveform.circle.fill" catalog="system" width="32" height="32"/>
+        <image name="waveform.circle" catalog="system" width="128" height="123"/>
+        <image name="waveform.circle.fill" catalog="system" width="128" height="123"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

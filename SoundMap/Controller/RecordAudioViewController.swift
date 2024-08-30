@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import AVFoundation
 import FirebaseFirestore
+import Firebase
 
 
 class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
@@ -30,6 +31,7 @@ class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
     var placeLat: CLLocationDegrees?
     var placeDistance: String?
     var placeID: String?
+    var placeType: String?
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var currentTimestamp = Timestamp(date: Date())
@@ -170,6 +172,7 @@ class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
                 destinationVC.placeLon = placeLon
                 destinationVC.placeDistance = placeDistance
                 destinationVC.placeID = placeID
+                destinationVC.placeType = placeType
                 destinationVC.userLocationLat = userLocationLat
                 destinationVC.userLocationLon = userLocationLon
                 destinationVC.audioFilename = audioFilename

@@ -22,6 +22,7 @@ class UploadViewController: UIViewController {
     var placeLat: CLLocationDegrees?
     var placeDistance: String?
     var placeID: String?
+    var placeType: String?
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var audioFilename: URL?
@@ -62,6 +63,7 @@ class UploadViewController: UIViewController {
             "placeLat": placeLat ?? 0,
             "placeDistance": placeDistance ?? "",
             "placeID": placeID ?? "",
+            "placeType": placeType ?? "",
             "userLocationLat": userLocationLat ?? 0,
             "userLocationLon": userLocationLon ?? 0,
             "uploadTime": currentTimestamp ?? Timestamp(date: Date()),

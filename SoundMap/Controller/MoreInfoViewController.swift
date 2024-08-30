@@ -21,6 +21,7 @@ class MoreInfoViewController: UIViewController {
     var placeLat: CLLocationDegrees?
     var placeDistance: String?
     var placeID: String?
+    var placeType: String?
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     var audioFilename: URL?
@@ -118,6 +119,7 @@ class MoreInfoViewController: UIViewController {
                  destinationVC.placeLon = placeLon
                  destinationVC.placeDistance = placeDistance
                  destinationVC.placeID = placeID
+                 destinationVC.placeType = placeType
                  destinationVC.userLocationLat = userLocationLat
                  destinationVC.userLocationLon = userLocationLon
                  destinationVC.audioFilename = audioFilename

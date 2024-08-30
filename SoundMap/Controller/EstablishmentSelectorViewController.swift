@@ -29,6 +29,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     var selectedPlaceLon: CLLocationDegrees?
     var selectedPlaceLat: CLLocationDegrees?
     var selectedPlaceID: String?
+    var selectedPlaceType: String?
     var userLocationLon: CLLocationDegrees?
     var userLocationLat: CLLocationDegrees?
     
@@ -86,14 +87,22 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 print("Autocomplete error: \(error.localizedDescription)")
                 return
             }
-            guard let results = results else {
+            guard let results = results, !results.isEmpty else {
                 print("No results found.")
+                DispatchQueue.main.async {
+                    self.searchResults = []
+                    self.tableView.reloadData()
+                    self.detailsLabel.text = "Looks like there is no Cafés, Restaurants or Bars closeby to your location."
+                    self.detailsLabel.textColor = UIColor.red
+                    self.detailsLabel.isHidden = false
+                }
                 return
             }
-            //print("Found \(results.count) results.")
+            
             self.searchResults = results
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.detailsLabel.isHidden = true // Make sure to hide the label if there are results
             }
         }
     }
@@ -202,7 +211,8 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     }
     
     func fetchPlaceDetails(for placeID: String, userLocation: CLLocation) {
-        placesClient.fetchPlace(fromPlaceID: placeID, placeFields: [.name, .formattedAddress, .placeID, .coordinate], sessionToken: nil) { (place, error) in
+        // Add .types to placeFields to fetch the types of the place
+        placesClient.fetchPlace(fromPlaceID: placeID, placeFields: [.name, .formattedAddress, .placeID, .coordinate, .types], sessionToken: nil) { (place, error) in
             guard let place = place, error == nil else {
                 print("Fetch place error: \(error?.localizedDescription ?? "")")
                 return
@@ -213,19 +223,24 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 let distance = userLocation.distance(from: placeLocation) / 1000 // Convert meters to kilometers
                 let distanceString = String(format: "%.1f", distance)
                 
-                // Store the details temporarily
+                // Extract the first type from the types array, if available
+                let firstType = place.types?.first ?? "Unknown Type"
+                
+                // Store the details temporarily, including the first type as a string
                 self.selectedPlaceName = place.name ?? "No Name"
                 self.selectedPlaceAddress = place.formattedAddress ?? "No address"
                 self.selectedPlaceLon = place.coordinate.longitude
                 self.selectedPlaceLat = place.coordinate.latitude
                 self.selectedPlaceDistance = "\(distanceString)km"
                 self.selectedPlaceID = place.placeID
+                self.selectedPlaceType = firstType // Now storing as a string
                 
-                // Create the attributed string for the details
+                // Create the attributed string for the details, now including the first place type
                 self.detailsLabel.attributedText = self.attributedDetailString(
                     name: place.name ?? "No Name",
                     address: place.formattedAddress ?? "No address",
-                    distance: distanceString
+                    distance: distanceString,
+                    type: firstType
                 )
                 
                 self.tableView.isHidden = true // Hide the table view
@@ -235,7 +250,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         }
     }
     
-    func attributedDetailString(name: String, address: String, distance: String) -> NSAttributedString {
+    func attributedDetailString(name: String, address: String, distance: String, type: String) -> NSAttributedString {
         let boldAttributes = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 17)]
         let regularAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .thin)]
         
@@ -245,9 +260,13 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
         attributedString.append(NSAttributedString(string: "\(address)\n", attributes: regularAttributes))
         attributedString.append(NSAttributedString(string: "Distance from you: ", attributes: boldAttributes))
         attributedString.append(NSAttributedString(string: "\(distance)km\n", attributes: regularAttributes))
+        attributedString.append(NSAttributedString(string: "Type: ", attributes: boldAttributes))
+        attributedString.append(NSAttributedString(string: "\(type)\n", attributes: regularAttributes))
         
         return attributedString
     }
+    
+    
     
     
     //MARK: - Navigation
@@ -263,6 +282,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 destinationVC.placeLat = selectedPlaceLat
                 destinationVC.placeDistance = selectedPlaceDistance
                 destinationVC.placeID = selectedPlaceID
+                destinationVC.placeType = selectedPlaceType
                 destinationVC.userLocationLon = userLocationLon
                 destinationVC.userLocationLat = userLocationLat
             }
