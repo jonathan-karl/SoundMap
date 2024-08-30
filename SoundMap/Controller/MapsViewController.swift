@@ -56,12 +56,16 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         // Configure the map style to hide default POIs and labels
         do {
             if let styleURL = Bundle.main.url(forResource: "MapStyle", withExtension: "json") {
-                self.mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleURL)
+                print("Found MapStyle.json at: \(styleURL)")
+                let styleString = try String(contentsOf: styleURL)
+                print("MapStyle contents: \(styleString)")
+                mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleURL)
+                print("Successfully applied map style")
             } else {
                 print("Unable to find MapStyle.json")
             }
         } catch {
-            print("One or more of the map styles failed to load. \(error)")
+            print("Failed to load map style. Error: \(error)")
         }
         
         // Initialize cluster manager
@@ -166,13 +170,13 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     func updateVisibleLabels() {
         let visibleRegion = mapView.projection.visibleRegion()
         let bounds = GMSCoordinateBounds(coordinate: visibleRegion.farLeft, coordinate: visibleRegion.nearRight)
-
+        
         var occupiedRects: [CGRect] = []
-
+        
         for marker in markers {
             let point = mapView.projection.point(for: marker.position)
             let labelRect = CGRect(x: point.x - 100, y: point.y - 40, width: 200, height: 20)
-
+            
             if bounds.contains(marker.position) {
                 if !occupiedRects.contains(where: { $0.intersects(labelRect) }) {
                     visibleLabels[marker] = true
@@ -184,31 +188,38 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 visibleLabels[marker] = false
             }
         }
-
+        
         for marker in markers {
             if let markerData = marker.userData as? MarkerData {
-                // Assuming markerData has a property 'placeType' which stores the type as a String
-                let markerType = markerData.placeType // Adjust this if your MarkerData class stores type differently
-                marker.icon = createCustomMarkerImage(with: marker.title ?? "", isVisible: visibleLabels[marker] ?? false, type: markerType)
+                marker.icon = createCustomMarkerImage(
+                    with: marker.title ?? "",
+                    isVisible: visibleLabels[marker] ?? false,
+                    type: markerData.placeType,
+                    averageNoiseLevel: markerData.averageNoiseLevel
+                )
             } else {
-                // Handle case where there is no valid markerData, use a default type if necessary
-                marker.icon = createCustomMarkerImage(with: marker.title ?? "", isVisible: visibleLabels[marker] ?? false, type: "default")
+                marker.icon = createCustomMarkerImage(
+                    with: marker.title ?? "",
+                    isVisible: visibleLabels[marker] ?? false,
+                    type: "default",
+                    averageNoiseLevel: 0
+                )
             }
         }
     }
-
     
-    func createCustomMarkerImage(with name: String, isVisible: Bool, type: String) -> UIImage {
-        let markerView = createCustomMarkerView(with: name, isVisible: isVisible, type: type)
+    
+    func createCustomMarkerImage(with name: String, isVisible: Bool, type: String, averageNoiseLevel: Double) -> UIImage {
+        let markerView = createCustomMarkerView(with: name, isVisible: isVisible, type: type, averageNoiseLevel: averageNoiseLevel)
         UIGraphicsBeginImageContextWithOptions(markerView.bounds.size, false, 0)
         markerView.layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image!
     }
-
     
-    func createCustomMarkerView(with name: String, isVisible: Bool, type: String) -> UIView {
+    
+    func createCustomMarkerView(with name: String, isVisible: Bool, type: String, averageNoiseLevel: Double) -> UIView {
         let markerView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 40))
         
         // Icon
@@ -228,7 +239,8 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             iconView.image = UIImage(systemName: "mappin.circle.fill") // Default icon
         }
         
-        iconView.tintColor = .black
+        // Set the tint color based on the average noise level
+        iconView.tintColor = getColorForNoiseLevel(averageNoiseLevel)
         markerView.addSubview(iconView)
         
         // Text
@@ -249,6 +261,19 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         return markerView
     }
     
+    func getColorForNoiseLevel(_ db: Double) -> UIColor {
+        switch db {
+        case ..<70:
+            return UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) // Green
+        case 70..<76:
+            return UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) // Yellow
+        case 76..<80:
+            return UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) // Orange
+        default:
+            return UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) // Red
+        }
+    }
+    
     func createCustomMarkerIcon(with name: String) -> UIImage {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 20))
         label.text = name
@@ -267,7 +292,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     func fetchAndDisplayMarkers() {
-        clusterManager.clearItems() // Clear existing items before adding new ones
+        clusterManager.clearItems()
         markers.removeAll()
         
         let db = Firestore.firestore()
@@ -284,7 +309,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 return
             }
             
-            var uniqueIds = Set<String>() // To keep track of unique IDs
+            var uniqueIds = Set<String>()
             
             for document in documents {
                 let data = document.data()
@@ -303,15 +328,16 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 if let latitude = data["placeLat"] as? Double,
                    let longitude = data["placeLon"] as? Double,
                    let placeName = data["placeName"] as? String,
-                   let placeAddress = data["placeAddress"] as? String {
+                   let placeAddress = data["placeAddress"] as? String,
+                   let averageNoiseLevel = data["averageNoiseLevel"] as? Double {
                     
-                    // Provide a default value of "" for placeType if it's missing
                     let placeType = data["placeType"] as? String ?? ""
                     
                     let markerData = MarkerData(
                         placeName: placeName,
                         placeAddress: placeAddress,
                         placeType: placeType,
+                        averageNoiseLevel: averageNoiseLevel,
                         conversationDifficultyElements: data["conversationDifficultyElements"] as? [String] ?? [],
                         conversationDifficultyFrequencies: data["conversationDifficultyFrequencies"] as? [Int] ?? [],
                         noiseSourcesElements: data["noiseSourcesElements"] as? [String] ?? [],
@@ -323,7 +349,12 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                     marker.title = placeName
                     marker.snippet = placeAddress
                     marker.userData = markerData
-                    marker.icon = createCustomMarkerImage(with: placeName, isVisible: true, type: placeType)
+                    marker.icon = self.createCustomMarkerImage(
+                        with: placeName,
+                        isVisible: true,
+                        type: placeType,
+                        averageNoiseLevel: averageNoiseLevel
+                    )
                     marker.groundAnchor = CGPoint(x: 0.5, y: 1)
                     self.clusterManager.add(marker)
                     self.markers.append(marker)
@@ -334,14 +365,13 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
                 }
             }
             
-            // Ensure cluster() is called on the main thread
             DispatchQueue.main.async {
                 self.clusterManager.cluster()
                 self.updateVisibleLabels()
             }
         }
     }
-
+    
     
     // Carry over information
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -366,17 +396,18 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
 class MarkerData {
     var placeName: String
     var placeAddress: String
-    var placeType: String // Add placeType as a property
+    var placeType: String
+    var averageNoiseLevel: Double
     var conversationDifficultyElements: [String]
     var conversationDifficultyFrequencies: [Int]
     var noiseSourcesElements: [String]
     var noiseSourcesFrequencies: [Int]
     
-    // Update the initializer to include placeType
-    init(placeName: String, placeAddress: String, placeType: String, conversationDifficultyElements: [String], conversationDifficultyFrequencies: [Int], noiseSourcesElements: [String], noiseSourcesFrequencies: [Int]) {
+    init(placeName: String, placeAddress: String, placeType: String, averageNoiseLevel: Double, conversationDifficultyElements: [String], conversationDifficultyFrequencies: [Int], noiseSourcesElements: [String], noiseSourcesFrequencies: [Int]) {
         self.placeName = placeName
         self.placeAddress = placeAddress
         self.placeType = placeType
+        self.averageNoiseLevel = averageNoiseLevel
         self.conversationDifficultyElements = conversationDifficultyElements
         self.conversationDifficultyFrequencies = conversationDifficultyFrequencies
         self.noiseSourcesElements = noiseSourcesElements

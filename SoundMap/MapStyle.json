@@ -1,5 +1,13 @@
 [
   {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
     "featureType": "poi",
     "elementType": "labels",
     "stylers": [
@@ -9,11 +17,20 @@
     ]
   },
   {
-    "featureType": "transit",
+    "featureType": "poi.business",
     "elementType": "labels",
     "stylers": [
       {
         "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "on"
       }
     ]
   },
