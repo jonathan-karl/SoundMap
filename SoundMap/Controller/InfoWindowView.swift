@@ -42,7 +42,7 @@ class CustomInfoWindow: UIView {
 
         titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
         
-        decibelLabel.font = UIFont.boldSystemFont(ofSize: 20) // Increased font size
+        decibelLabel.font = UIFont.boldSystemFont(ofSize: 20)
         decibelLabel.textAlignment = .right
         
         conversationTitleLabel.font = UIFont.boldSystemFont(ofSize: 12)
@@ -63,7 +63,7 @@ class CustomInfoWindow: UIView {
 
             decibelLabel.topAnchor.constraint(equalTo: topAnchor, constant: 18),
             decibelLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -18),
-            decibelLabel.widthAnchor.constraint(equalToConstant: 90), // Increased width
+            decibelLabel.widthAnchor.constraint(equalToConstant: 90),
 
             conversationTitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
             conversationTitleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
@@ -343,5 +343,5 @@ struct VenueNoiseData {
     let venueName: String
     let noiseLevel: Int
     let conversationEase: String
-    let topNoises: [(String, Int)]
+    let topNoises: [(String, Int)]  // Now the Int represents percentage
 }
