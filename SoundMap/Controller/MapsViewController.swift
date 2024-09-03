@@ -10,6 +10,7 @@ import CoreLocation
 import GoogleMaps
 import GoogleMapsUtils
 import FirebaseFirestore
+import SafariServices
 
 class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, GMUClusterManagerDelegate {
     
@@ -234,7 +235,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             return
         }
         
-        let infoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 250, height: 180))
+        let infoWindow = CustomInfoWindow(frame: CGRect(x: 0, y: 0, width: 300, height: 320))
         
         // Calculate the most common conversation difficulty
         let conversationDifficulties = ["Comfortable": 1, "Manageable": 2, "Challenging": 3]
@@ -269,6 +270,14 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             self?.performSegue(withIdentifier: "seeDetails", sender: markerData)
         }
         
+        infoWindow.onGoogleMapsTap = { [weak self] in
+            self?.openInGoogleMaps(placeName: markerData.placeName, latitude: marker.position.latitude, longitude: marker.position.longitude)
+        }
+        
+        infoWindow.onShareTap = { [weak self] in
+            self?.shareVenueInfo(venueData: venueData)
+        }
+        
         mapView.addSubview(infoWindow)
         customInfoWindow = infoWindow
         selectedMarker = marker
@@ -280,8 +289,18 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         guard let infoWindow = customInfoWindow else { return }
         
         let markerPoint = mapView.projection.point(for: marker.position)
-        let infoWindowPoint = CGPoint(x: markerPoint.x, y: markerPoint.y - infoWindow.frame.height - 10)
-        infoWindow.center = infoWindowPoint
+        let markerFrame = CGRect(x: markerPoint.x - 20, y: markerPoint.y - 40, width: 40, height: 40)
+        
+        // Calculate the info window position
+        let infoWindowX = markerFrame.midX - infoWindow.frame.width / 2
+        let infoWindowY = markerFrame.minY - infoWindow.frame.height - 15 // Reduced gap between pin and info window
+        
+        // Ensure the info window stays within the map bounds
+        let maxX = mapView.frame.width - infoWindow.frame.width
+        let minX: CGFloat = 0
+        let x = max(minX, min(infoWindowX, maxX))
+        
+        infoWindow.frame = CGRect(x: x, y: infoWindowY, width: infoWindow.frame.width, height: infoWindow.frame.height)
     }
     
     private func hideCustomInfoWindow() {
@@ -290,6 +309,28 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         selectedMarker = nil
     }
     
+    private func openInGoogleMaps(placeName: String, latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        let encodedName = placeName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "https://www.google.com/maps/search/?api=1&query=\(encodedName)&query_place_id=\(latitude),\(longitude)"
+        
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+    
+    private func shareVenueInfo(venueData: VenueNoiseData) {
+        let shareText = """
+            Check out the noise levels at \(venueData.venueName)!
+            Noise Level: \(venueData.noiseLevel) dB
+            Conversation Ease: \(venueData.conversationEase)
+            Top Noises: \(venueData.topNoises.map { "\($0.0) (\($0.1)%)" }.joined(separator: ", "))
+            
+            Download SoundMap to explore more: https://apps.apple.com/app/soundmap/id6482854844
+            """
+        
+        let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+        present(activityViewController, animated: true, completion: nil)
+    }
     
     func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
         guard let markerData = marker.userData as? MarkerData else {
