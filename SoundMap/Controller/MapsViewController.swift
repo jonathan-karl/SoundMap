@@ -293,7 +293,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         
         // Calculate the info window position
         let infoWindowX = markerFrame.midX - infoWindow.frame.width / 2
-        let infoWindowY = markerFrame.minY - infoWindow.frame.height - 15 // Reduced gap between pin and info window
+        let infoWindowY = markerFrame.minY - infoWindow.frame.height - 25 // Reduced gap between pin and info window
         
         // Ensure the info window stays within the map bounds
         let maxX = mapView.frame.width - infoWindow.frame.width
