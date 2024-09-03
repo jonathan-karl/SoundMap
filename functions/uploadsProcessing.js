@@ -26,15 +26,25 @@ exports.aggregateUploadsData = functions.firestore
                     aggregates[placeID] = {
                         conversationDifficulty: {}, 
                         noiseSources: {},
-                        placeTypes: {},  // Add a dictionary for placeTypes aggregation
+                        placeTypes: {},
                         placeName: data.placeName || "Unknown Place",
                         placeAddress: data.placeAddress || "Unknown Address",
                         placeLon: data.placeLon || 0,
                         placeLat: data.placeLat || 0,
                         totalNoiseLevel: 0, 
-                        noiseLevelCount: 0
+                        noiseLevelCount: 0,
+                        submissionCount: 0,
+                        latestUploadTimestamp: null // Initialize latest upload timestamp
                     };
                 }
+
+                // Update latest upload timestamp if this upload is newer
+                if (!aggregates[placeID].latestUploadTimestamp || data.uploadTime > aggregates[placeID].latestUploadTimestamp) {
+                    aggregates[placeID].latestUploadTimestamp = data.uploadTime;
+                }
+
+                // Increment submission count for this placeID
+                aggregates[placeID].submissionCount++;
 
                 // Aggregate conversationDifficulty as before
                 if (data.hasOwnProperty('conversationDifficulty')) {
@@ -66,7 +76,7 @@ exports.aggregateUploadsData = functions.firestore
             });
 
             for (const placeID in aggregates) {
-              const {conversationDifficulty, noiseSources, placeTypes, placeName, placeAddress, placeLon, placeLat, totalNoiseLevel, noiseLevelCount} = aggregates[placeID];
+              const {conversationDifficulty, noiseSources, placeTypes, placeName, placeAddress, placeLon, placeLat, totalNoiseLevel, noiseLevelCount, submissionCount, latestUploadTimestamp} = aggregates[placeID];
               let conversationDifficultyElements = [], conversationDifficultyFrequencies = [];
               let noiseSourcesElements = [], noiseSourcesFrequencies = [];
               let averageNoiseLevel = noiseLevelCount > 0 ? totalNoiseLevel / noiseLevelCount : 0;
@@ -98,7 +108,9 @@ exports.aggregateUploadsData = functions.firestore
                     const sortedSources = Object.entries(noiseSources).sort((a, b) => b[1] - a[1]);
                     sortedSources.forEach(([element, frequency]) => {
                         noiseSourcesElements.push(element);
-                        noiseSourcesFrequencies.push(frequency);
+                        // Calculate percentage and round to nearest integer
+                        const percentage = Math.round((frequency / submissionCount) * 100);
+                        noiseSourcesFrequencies.push(percentage);
                     });
                 }
 
@@ -113,9 +125,11 @@ exports.aggregateUploadsData = functions.firestore
                     placeLon,
                     placeLat,
                     placeID,
-                    placeType,  // Add the determined placeType
-                    averageNoiseLevel, // Add the average noise level
-                    WIP: WIP  // Include the WIP status
+                    placeType,
+                    averageNoiseLevel,
+                    submissionCount,
+                    latestUploadTimestamp, // Add the latest upload timestamp to the output
+                    WIP: WIP
                 }, {merge: true});
             }
         } catch (error) {
