@@ -253,11 +253,10 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             mostCommonDifficulty = "Challenging"
         }
         
-        // Calculate the top 3 noise sources with frequencies
         let topNoises = zip(markerData.noiseSourcesElements, markerData.noiseSourcesFrequencies)
             .sorted { $0.1 > $1.1 }
             .prefix(3)
-            .map { ($0.0, Int(Double($0.1) / Double(markerData.noiseSourcesFrequencies.reduce(0, +)) * 100)) }
+            .map { ($0.0, $0.1) } // Use the pre-calculated percentage directly
         
         let venueData = VenueNoiseData(
             venueName: markerData.placeName,
@@ -343,9 +342,9 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             noiseLevel: Int(markerData.averageNoiseLevel),
             conversationEase: markerData.conversationDifficultyElements.first ?? "Unknown",
             topNoises: zip(markerData.noiseSourcesElements, markerData.noiseSourcesFrequencies)
-                .map { ($0, $1) }
+                .sorted { $0.1 > $1.1 }
                 .prefix(3)
-                .map { ($0, Int($1)) }
+                .map { ($0, $1) } // Use the pre-calculated percentage directly
         )
         customInfoWindow.configure(with: venueData)
         

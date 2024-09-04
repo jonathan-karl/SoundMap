@@ -235,5 +235,5 @@ struct VenueNoiseData {
     let venueName: String
     let noiseLevel: Int
     let conversationEase: String
-    let topNoises: [(String, Int)]  // Now the Int represents percentage
+    let topNoises: [(String, Int)]  // Now the Int represents the actual percentage
 }
