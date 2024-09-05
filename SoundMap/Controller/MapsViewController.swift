@@ -61,6 +61,8 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleMapTap(_:)))
         mapView.addGestureRecognizer(tapGesture)
         
+        // Add this line to ensure the map style updates with the interface style
+        overrideUserInterfaceStyle = .unspecified
         
     }
     
@@ -266,8 +268,10 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         )
         infoWindow.configure(with: venueData)
         infoWindow.onTap = { [weak self] in
-            self?.performSegue(withIdentifier: "seeDetails", sender: markerData)
-        }
+                    // Instead of performing a segue, you can show more details right in the info window
+                    // or implement a new way to display detailed information
+                    self?.showDetailedInfo(for: markerData)
+                }
         
         infoWindow.onGoogleMapsTap = { [weak self] in
             self?.openInGoogleMaps(placeName: markerData.placeName, latitude: marker.position.latitude, longitude: marker.position.longitude)
@@ -283,6 +287,22 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         
         updateInfoWindowPosition(for: marker)
     }
+    
+    private func showDetailedInfo(for markerData: MarkerData) {
+            // Implement a new way to show detailed information
+            // For example, you could present a modal view controller with more details
+            let detailedVC = UIViewController()
+            detailedVC.view.backgroundColor = .white
+            
+            let label = UILabel()
+            label.text = "Detailed info for \(markerData.placeName)"
+            label.textAlignment = .center
+            label.frame = CGRect(x: 20, y: 100, width: 300, height: 50)
+            
+            detailedVC.view.addSubview(label)
+            
+            present(detailedVC, animated: true, completion: nil)
+        }
     
     private func updateInfoWindowPosition(for marker: GMSMarker) {
         guard let infoWindow = customInfoWindow else { return }
@@ -357,10 +377,12 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
-        if let markerData = marker.userData as? MarkerData {
-            self.performSegue(withIdentifier: "seeDetails", sender: markerData)
+            // Remove the segue to DetailedViewController
+            if let markerData = marker.userData as? MarkerData {
+                // Instead of navigating to DetailedViewController, you can show the data in the custom info window
+                showCustomInfoWindow(for: marker)
+            }
         }
-    }
     
     func updateVisibleLabels() {
         let visibleRegion = mapView.projection.visibleRegion()
@@ -439,7 +461,8 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             let label = PaddingLabel()
             label.text = name
             label.textAlignment = .center
-            label.backgroundColor = .white
+            label.backgroundColor = .systemBackground
+            label.textColor = .label
             label.layer.cornerRadius = 10
             label.layer.masksToBounds = true
             label.font = UIFont.boldSystemFont(ofSize: 12)
@@ -464,13 +487,21 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     func getColorForNoiseLevel(_ db: Double) -> UIColor {
         switch db {
         case ..<70:
-            return UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) // Green
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) : UIColor(red: 2/255, green: 180/255, blue: 77/255, alpha: 1)
+            }
         case 70..<76:
-            return UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) // Yellow
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) : UIColor(red: 204/255, green: 169/255, blue: 0, alpha: 1)
+            }
         case 76..<80:
-            return UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) // Orange
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) : UIColor(red: 170/255, green: 75/255, blue: 18/255, alpha: 1)
+            }
         default:
-            return UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) // Red
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) : UIColor(red: 167/255, green: 26/255, blue: 15/255, alpha: 1)
+            }
         }
     }
     
@@ -573,20 +604,6 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             }
         }
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "seeDetails",
-           let destinationVC = segue.destination as? DetailedViewController,
-           let markerData = sender as? MarkerData {
-            destinationVC.placeName = markerData.placeName
-            destinationVC.placeAddress = markerData.placeAddress
-            destinationVC.conversationDifficultyElements = markerData.conversationDifficultyElements
-            destinationVC.conversationDifficultyFrequencies = markerData.conversationDifficultyFrequencies
-            destinationVC.noiseSourcesElements = markerData.noiseSourcesElements
-            destinationVC.noiseSourcesFrequencies = markerData.noiseSourcesFrequencies
-        }
-    }
-    
 }
 
 // MARK: - UIGestureRecognizerDelegate
