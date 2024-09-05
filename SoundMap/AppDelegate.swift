@@ -10,6 +10,9 @@ import GoogleMaps
 import GooglePlaces
 import FirebaseCore
 import FirebaseFirestore
+import Firebase
+import FirebaseAuth
+import GoogleSignIn
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,6 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Configure Firebase
         FirebaseApp.configure()
+        
+        // Force light mode for the entire app
+        setAppearanceForAllScenes()
         
         return true
     }
@@ -41,6 +47,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
     
+    func application(_ app: UIApplication,
+                         open url: URL,
+                         options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+            return GIDSignIn.sharedInstance.handle(url)
+        }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
@@ -69,6 +80,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return false
     }
     
+    // Helper method to set appearance for all scenes
+        private func setAppearanceForAllScenes() {
+            if #available(iOS 15.0, *) {
+                // Use the new scene-based approach for iOS 15 and later
+                for scene in UIApplication.shared.connectedScenes {
+                    if let windowScene = scene as? UIWindowScene {
+                        for window in windowScene.windows {
+                            window.overrideUserInterfaceStyle = .light
+                        }
+                    }
+                }
+            } else if #available(iOS 13.0, *) {
+                // Use the window-based approach for iOS 13 and 14
+                UIApplication.shared.windows.forEach { window in
+                    window.overrideUserInterfaceStyle = .light
+                }
+            } else {
+                // For iOS 12 and earlier, set the status bar style
+                UIApplication.shared.statusBarStyle = .default
+            }
+        }
+    
     
 }
-
