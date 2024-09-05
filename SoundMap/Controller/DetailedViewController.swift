@@ -24,8 +24,12 @@ class DetailedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .systemBackground
+        placeNameLabel.textColor = .label
         placeNameLabel.text = placeName
-  
+        
+        placeNameLabel.text = placeName
+        
         // Setup noiseDetectedBarChart
         setupBarChart(
             barChartView: conversationDifficultyBarChart,
@@ -71,7 +75,7 @@ class DetailedViewController: UIViewController {
         
         let dataSet = BarChartDataSet(entries: dataEntries, label: label)
         dataSet.colors = barColors
-        dataSet.valueTextColor = UIColor.black
+        dataSet.valueTextColor = .label
         dataSet.valueFont = .systemFont(ofSize: 12)
         
         let valueFormatter = NumberFormatter()
@@ -86,7 +90,7 @@ class DetailedViewController: UIViewController {
         let topElements = topFour.map { $0.0 }
         customizeChartAppearance(barChartView: barChartView, elements: topElements)
     }
-
+    
     
     private func customizeChartAppearance(barChartView: BarChartView, elements: [String]) {
         barChartView.extraBottomOffset = 100 // Adjust the value as needed
@@ -106,6 +110,30 @@ class DetailedViewController: UIViewController {
         barChartView.legend.enabled = false
         barChartView.xAxis.labelRotationAngle = -45 // Optional: rotate labels if necessary
         
+        barChartView.xAxis.labelTextColor = .label
+        barChartView.leftAxis.labelTextColor = .label
+        barChartView.rightAxis.labelTextColor = .label
+        barChartView.legend.textColor = .label
+        
+    }
+    
+    private func getColorForConversationDifficulty(_ difficulty: String) -> UIColor {
+        switch difficulty {
+        case "Comfortable":
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 67/255.0, green: 190/255.0, blue: 90/255.0, alpha: 1) : UIColor(red: 53/255.0, green: 152/255.0, blue: 72/255.0, alpha: 1)
+            }
+        case "Manageable":
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 232/255.0, green: 185/255.0, blue: 5/255.0, alpha: 1) : UIColor(red: 185/255.0, green: 148/255.0, blue: 4/255.0, alpha: 1)
+            }
+        case "Challenging":
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 236/255.0, green: 55/255.0, blue: 45/255.0, alpha: 1) : UIColor(red: 188/255.0, green: 44/255.0, blue: 36/255.0, alpha: 1)
+            }
+        default:
+            return .label
+        }
     }
     
 }
