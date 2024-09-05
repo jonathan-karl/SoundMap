@@ -434,11 +434,28 @@
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="viewControllers" id="uY8-8w-bng"/>
                         <segue destination="zCZ-sH-XRM" kind="relationship" relationship="viewControllers" id="Yt4-KL-jKq"/>
+                        <segue destination="HEy-Zm-490" kind="relationship" relationship="viewControllers" id="aza-DE-x7W"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qct-Qs-2RN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="101.5267175572519" y="3.5211267605633805"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="7AX-KK-FE1">
+            <objects>
+                <viewController id="HEy-Zm-490" customClass="UserTabViewController" customModule="SoundMap" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Re1-dk-u0M">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="i9r-eH-7rU"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Settings" image="gear" catalog="system" selectedImage="gear" id="0KW-Ek-Tec"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6x7-aq-szl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1579" y="4"/>
         </scene>
         <!--Record-->
         <scene sceneID="GFz-Eu-AcN">
@@ -463,6 +480,7 @@
     <resources>
         <image name="arrowshape.forward.fill" catalog="system" width="128" height="104"/>
         <image name="arrowshape.right.fill" catalog="system" width="128" height="104"/>
+        <image name="gear" catalog="system" width="128" height="122"/>
         <image name="icloud.and.arrow.up.fill" catalog="system" width="128" height="108"/>
         <image name="map.circle" catalog="system" width="128" height="123"/>
         <image name="map.circle.fill" catalog="system" width="128" height="123"/>
