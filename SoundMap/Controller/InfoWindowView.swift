@@ -37,9 +37,9 @@ class CustomInfoWindow: UIView {
     }
     
     private func setupViews() {
-        backgroundColor = .white
+        backgroundColor = .systemBackground
         layer.cornerRadius = 16
-        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowColor = UIColor.label.cgColor
         layer.shadowOpacity = 0.1
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 10
@@ -49,8 +49,9 @@ class CustomInfoWindow: UIView {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
+        titleLabel.textColor = .label
+        decibelLabel.textColor = .label
         titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        
         decibelLabel.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         decibelLabel.textAlignment = .right
         
@@ -70,12 +71,13 @@ class CustomInfoWindow: UIView {
         }
         
         conversationIcon.image = UIImage(systemName: "bubble.left.fill")
-        
+        conversationIcon.tintColor = .label
+        conversationLabel.textColor = .label
         conversationLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
     }
     
     private func setupTopNoisesView() {
-        topNoisesView.backgroundColor = UIColor.systemGray6 // Light gray background
+        topNoisesView.backgroundColor = .secondarySystemBackground
         topNoisesView.layer.cornerRadius = 12
         
         [topNoisesIcon, topNoisesLabel, topNoisesList].forEach {
@@ -88,7 +90,8 @@ class CustomInfoWindow: UIView {
         
         topNoisesLabel.text = "Top Noises"
         topNoisesLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        topNoisesLabel.textColor = .darkGray // Darker text color
+        topNoisesIcon.tintColor = .secondaryLabel
+        topNoisesLabel.textColor = .secondaryLabel
         
         topNoisesList.axis = .vertical
         topNoisesList.spacing = 4
@@ -103,7 +106,7 @@ class CustomInfoWindow: UIView {
             buttonStackView.addArrangedSubview($0)
             $0.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
             $0.layer.cornerRadius = 12
-            $0.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
+            $0.backgroundColor = .systemBlue.withAlphaComponent(0.1)
             $0.setTitleColor(.systemBlue, for: .normal)
         }
         
@@ -207,26 +210,40 @@ class CustomInfoWindow: UIView {
     private func getColorForNoiseLevel(_ db: Double) -> UIColor {
         switch db {
         case ..<70:
-            return UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) // Green
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 2/255, green: 226/255, blue: 97/255, alpha: 1) : UIColor(red: 2/255, green: 180/255, blue: 77/255, alpha: 1)
+            }
         case 70..<76:
-            return UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) // Yellow
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 255/255, green: 212/255, blue: 0, alpha: 1) : UIColor(red: 204/255, green: 169/255, blue: 0, alpha: 1)
+            }
         case 76..<80:
-            return UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) // Orange
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 213/255, green: 94/255, blue: 23/255, alpha: 1) : UIColor(red: 170/255, green: 75/255, blue: 18/255, alpha: 1)
+            }
         default:
-            return UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) // Red
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 209/255, green: 33/255, blue: 19/255, alpha: 1) : UIColor(red: 167/255, green: 26/255, blue: 15/255, alpha: 1)
+            }
         }
     }
     
     private func getColorForConversationDifficulty(_ difficulty: String) -> UIColor {
         switch difficulty {
         case "Comfortable":
-            return UIColor(red: 67/255.0, green: 190/255.0, blue: 90/255.0, alpha: 1)
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 67/255.0, green: 190/255.0, blue: 90/255.0, alpha: 1) : UIColor(red: 53/255.0, green: 152/255.0, blue: 72/255.0, alpha: 1)
+            }
         case "Manageable":
-            return UIColor(red: 232/255.0, green: 185/255.0, blue: 5/255.0, alpha: 1)
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 232/255.0, green: 185/255.0, blue: 5/255.0, alpha: 1) : UIColor(red: 185/255.0, green: 148/255.0, blue: 4/255.0, alpha: 1)
+            }
         case "Challenging":
-            return UIColor(red: 236/255.0, green: 55/255.0, blue: 45/255.0, alpha: 1)
+            return UIColor { traitCollection in
+                traitCollection.userInterfaceStyle == .dark ? UIColor(red: 236/255.0, green: 55/255.0, blue: 45/255.0, alpha: 1) : UIColor(red: 188/255.0, green: 44/255.0, blue: 36/255.0, alpha: 1)
+            }
         default:
-            return .black
+            return .label
         }
     }
 }
