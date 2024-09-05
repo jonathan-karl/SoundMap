@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>864853662106-mmgf214p6c79decm7jtnj2da1uea8mj5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.864853662106-mmgf214p6c79decm7jtnj2da1uea8mj5</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDCTVfHZdMH7osY2y4F7xeZ2X2s3SyL06k</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.jsk.SoundMap</string>
+	<string>com.jsk.Noise</string>
 	<key>PROJECT_ID</key>
 	<string>noise-413318</string>
 	<key>STORAGE_BUCKET</key>
@@ -26,5 +30,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:864853662106:ios:84347c730defc8d0280223</string>
+	<key>DATABASE_URL</key>
+	<string>https://noise-413318-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>
