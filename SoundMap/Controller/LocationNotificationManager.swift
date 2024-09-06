@@ -236,7 +236,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         }
         
         let title = "New Venue Detected"
-        let body = "Are you at \(place.name ?? "a new venue"). Would you like to record the noise level?"
+        let body = "Are you at \(place.name ?? "a new venue")? Would you like to record the noise level?"
         
         let content = UNMutableNotificationContent()
         content.title = title
