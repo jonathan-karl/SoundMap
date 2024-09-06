@@ -26,6 +26,8 @@
 		ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */; };
 		ABE28FBE2C8A2C6C00B09220 /* UserTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */; };
 		ABE28FC02C8A2CB300B09220 /* UserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */; };
+		ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */; };
+		ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +55,8 @@
 		ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAudioViewController.swift; sourceTree = "<group>"; };
 		ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTabView.swift; sourceTree = "<group>"; };
 		ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTabViewController.swift; sourceTree = "<group>"; };
+		ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredLocationsView.swift; sourceTree = "<group>"; };
+		ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationNotificationManager.swift; sourceTree = "<group>"; };
 		D2B8851B115249E51612B43F /* Pods-Noise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Noise.release.xcconfig"; path = "Target Support Files/Pods-Noise/Pods-Noise.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,6 +85,8 @@
 				AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */,
 				ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */,
 				ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */,
+				ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */,
+				ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -276,6 +282,8 @@
 			files = (
 				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
 				ABE28FBE2C8A2C6C00B09220 /* UserTabView.swift in Sources */,
+				ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */,
+				ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */,
 				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
 				AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */,
 				AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */,
@@ -441,6 +449,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to enable you to locate yourself on the map and ensure each recording is actually from the establishment where the user is.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the  microphone to record audio for your pins.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "\"\"";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
@@ -480,6 +489,7 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app uses your location to enable you to locate yourself on the map and ensure each recording is actually from the establishment where the user is.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the  microphone to record audio for your pins.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "\"\"";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
