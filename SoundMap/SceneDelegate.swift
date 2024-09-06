@@ -18,9 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         window?.overrideUserInterfaceStyle = .light
         
-        let window = UIWindow(windowScene: windowScene)
-        self.window = window
-        
         let launchScreen = AnimatedLaunchScreen {
             // This closure will be called when loading is complete
             DispatchQueue.main.async {
@@ -28,8 +25,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
         
-        window.rootViewController = UIHostingController(rootView: launchScreen)
-        window.makeKeyAndVisible()
+        window?.rootViewController = UIHostingController(rootView: launchScreen)
+        window?.makeKeyAndVisible()
     }
     
     private func transitionToMainApp() {
@@ -48,6 +45,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             tabBarController.tabBar.barTintColor = .white
         }
+        
+        // Ensure light mode is set for the tab bar controller
+        tabBarController.overrideUserInterfaceStyle = .light
         
         // Perform the transition
         UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
