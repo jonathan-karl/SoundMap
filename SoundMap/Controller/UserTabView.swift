@@ -57,6 +57,7 @@ struct UserTabView: View {
                 VStack(spacing: 24) {
                     welcomeSection
                     helpAndPreferencesSection
+                    ignoredLocationsSection
                     feedbackSection
                 }
                 .padding()
@@ -130,11 +131,31 @@ struct UserTabView: View {
         .cornerRadius(12)
     }
     
+    private var ignoredLocationsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Ignored Locations")
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            NavigationLink(destination: IgnoredLocationsView()) {
+                HStack {
+                    Text("Manage Ignored Locations")
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+            }
+            .foregroundColor(.blue)
+        }
+        .padding()
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .cornerRadius(12)
+    }
+    
     private func statusColor(for status: String) -> Color {
         let greenColor = Color(UIColor { traitCollection in
             traitCollection.userInterfaceStyle == .dark ?
-                UIColor(red: 0, green: 0.8, blue: 0, alpha: 1) :  // Darker green for dark mode
-                UIColor(red: 0, green: 0.6, blue: 0, alpha: 1)    // Lighter green for light mode
+            UIColor(red: 0, green: 0.8, blue: 0, alpha: 1) :  // Darker green for dark mode
+            UIColor(red: 0, green: 0.6, blue: 0, alpha: 1)    // Lighter green for light mode
         })
         
         switch status {
