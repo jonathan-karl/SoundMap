@@ -44,6 +44,9 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         setupMapView()
         setupClusterManager()
         
+        // Start monitoring for location updates
+        startMonitoring()
+        
         // Fetch and display markers
         fetchAndDisplayMarkers()
         
@@ -70,6 +73,9 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func startMonitoring() {
         locationManager?.requestWhenInUseAuthorization()
     }
     
@@ -113,7 +119,6 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        print("Current Location Authorization Status: \(manager.authorizationStatus.rawValue)")
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             print("Location Authorization Granted.")
@@ -121,18 +126,32 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
             mapView.isMyLocationEnabled = true
             mapView.settings.myLocationButton = true
         case .notDetermined:
-            print("Location Authorization Not Determined, requesting.")
-            locationManager?.requestWhenInUseAuthorization()
+            print("Location Authorization Not Determined.")
+            // Don't request authorization here, it's already done in startMonitoring()
         case .restricted, .denied:
             print("Location Authorization Denied or Restricted.")
-        default:
+            // Handle the case where the user has denied location access
+            // You might want to show an alert or update the UI accordingly
+        @unknown default:
             break
         }
     }
     
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        locationManager?.stopUpdatingLocation() // Stop location updates if you only need it once
+        guard let location = locations.last else { return }
+        // Use the location data as needed
+        print("Location updated: \(location.coordinate)")
+        // You might want to update the map's camera position here
+        let camera = GMSCameraPosition.camera(withLatitude: location.coordinate.latitude,
+                                              longitude: location.coordinate.longitude,
+                                              zoom: 15)
+        mapView.animate(to: camera)
+        
+        // Stop location updates if you only need it once
+        locationManager?.stopUpdatingLocation()
+        
+        // Fetch and display markers
         fetchAndDisplayMarkers()
     }
     
@@ -268,10 +287,10 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         )
         infoWindow.configure(with: venueData)
         infoWindow.onTap = { [weak self] in
-                    // Instead of performing a segue, you can show more details right in the info window
-                    // or implement a new way to display detailed information
-                    self?.showDetailedInfo(for: markerData)
-                }
+            // Instead of performing a segue, you can show more details right in the info window
+            // or implement a new way to display detailed information
+            self?.showDetailedInfo(for: markerData)
+        }
         
         infoWindow.onGoogleMapsTap = { [weak self] in
             self?.openInGoogleMaps(placeName: markerData.placeName, latitude: marker.position.latitude, longitude: marker.position.longitude)
@@ -289,20 +308,20 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     private func showDetailedInfo(for markerData: MarkerData) {
-            // Implement a new way to show detailed information
-            // For example, you could present a modal view controller with more details
-            let detailedVC = UIViewController()
-            detailedVC.view.backgroundColor = .white
-            
-            let label = UILabel()
-            label.text = "Detailed info for \(markerData.placeName)"
-            label.textAlignment = .center
-            label.frame = CGRect(x: 20, y: 100, width: 300, height: 50)
-            
-            detailedVC.view.addSubview(label)
-            
-            present(detailedVC, animated: true, completion: nil)
-        }
+        // Implement a new way to show detailed information
+        // For example, you could present a modal view controller with more details
+        let detailedVC = UIViewController()
+        detailedVC.view.backgroundColor = .white
+        
+        let label = UILabel()
+        label.text = "Detailed info for \(markerData.placeName)"
+        label.textAlignment = .center
+        label.frame = CGRect(x: 20, y: 100, width: 300, height: 50)
+        
+        detailedVC.view.addSubview(label)
+        
+        present(detailedVC, animated: true, completion: nil)
+    }
     
     private func updateInfoWindowPosition(for marker: GMSMarker) {
         guard let infoWindow = customInfoWindow else { return }
@@ -377,12 +396,12 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
-            // Remove the segue to DetailedViewController
-            if let markerData = marker.userData as? MarkerData {
-                // Instead of navigating to DetailedViewController, you can show the data in the custom info window
-                showCustomInfoWindow(for: marker)
-            }
+        // Remove the segue to DetailedViewController
+        if let markerData = marker.userData as? MarkerData {
+            // Instead of navigating to DetailedViewController, you can show the data in the custom info window
+            showCustomInfoWindow(for: marker)
         }
+    }
     
     func updateVisibleLabels() {
         let visibleRegion = mapView.projection.visibleRegion()
