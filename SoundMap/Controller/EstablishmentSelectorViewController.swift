@@ -92,7 +92,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 DispatchQueue.main.async {
                     self.searchResults = []
                     self.tableView.reloadData()
-                    self.detailsLabel.text = "Looks like there is no Cafés, Restaurants or Bars closeby to your location."
+                    self.detailsLabel.text = "Looks like there are no Cafés, Restaurants or Bars close to your location."
                     self.detailsLabel.textColor = UIColor.red
                     self.detailsLabel.isHidden = false
                 }
@@ -102,6 +102,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
             self.searchResults = results
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.detailsLabel.textColor = UIColor.black // Reset color to black when results are found
                 self.detailsLabel.isHidden = true // Make sure to hide the label if there are results
             }
         }
@@ -109,6 +110,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         detailsLabel.isHidden = true // Hide the label
+        detailsLabel.textColor = UIColor.black // Reset color to black
         placeConfirmationButton.isHidden = true
         placeConfirmationButton.tintColor = UIColor.blue
         tableView.isHidden = false // Show the table view
@@ -236,6 +238,7 @@ class EstablishmentSelectorViewController: UIViewController,  UISearchBarDelegat
                 self.selectedPlaceType = firstType // Now storing as a string
                 
                 // Create the attributed string for the details, now including the first place type
+                self.detailsLabel.textColor = UIColor.black // Ensure the color is black when showing place details
                 self.detailsLabel.attributedText = self.attributedDetailString(
                     name: place.name ?? "No Name",
                     address: place.formattedAddress ?? "No address",
