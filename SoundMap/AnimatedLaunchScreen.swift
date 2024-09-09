@@ -55,7 +55,6 @@ struct AnimatedLaunchScreen: View {
 
                 ProgressView(value: loadingProgress, total: 1.0)
                     .frame(width: 200)
-                    .animation(.linear(duration: 0.1), value: loadingProgress)
 
                 Text("Loading...")
                     .font(.system(size: 12, weight: .regular, design: .default))
@@ -79,8 +78,8 @@ struct AnimatedLaunchScreen: View {
             // Simulate progress
             for _ in 1...20 {
                 DispatchQueue.main.async {
-                    withAnimation {
-                        loadingProgress += 0.05
+                    withAnimation(.linear(duration: 0.05)) {
+                        loadingProgress = min(loadingProgress + 0.05, 1.0)
                     }
                 }
                 Thread.sleep(forTimeInterval: 0.05) // Simulating work being done
@@ -88,7 +87,7 @@ struct AnimatedLaunchScreen: View {
 
             // Ensure we reach 100% progress
             DispatchQueue.main.async {
-                withAnimation {
+                withAnimation(.linear(duration: 0.05)) {
                     loadingProgress = 1.0
                 }
                 // Small delay to ensure animations complete
