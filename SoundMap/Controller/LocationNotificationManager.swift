@@ -51,20 +51,24 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     private let notificationCenter = UNUserNotificationCenter.current()
     private let placesClient = GMSPlacesClient.shared()
     
-    private var oneTimeLocationCompletion: ((Result<CLLocation, Error>) -> Void)?
+    private var isMonitoring = false
     
-    private var lastCheckedLocation: CLLocation?
-    private var currentVenueArrivalTime: Date?
+    private var lastSignificantLocation: CLLocation?
+    private var stayStartTime: Date?
     private var notifiedVenues: [String: Date] = [:]
     private var frequentlyVisitedVenues: [String: Int] = [:]
     private var ignoredLocations: [IgnoredLocation] = []
+    private var lastNotificationTime: Date?
+    private var oneTimeLocationCompletion: ((Result<CLLocation, Error>) -> Void)?
     
-    private let minimumStayDuration: TimeInterval = 10 // 5 minutes (CHANGE BACK TO 300)
+    private let minimumStayDuration: TimeInterval = 300 // 5 minutes
     private let maxDailyNotifications: Int = 5
     private let speedThreshold: CLLocationSpeed = 2.0 // m/s, roughly walking speed
     private let venueCooldown: TimeInterval = 86400 // 1 day cooldown per venue
+    private let notificationCooldown: TimeInterval = 3600 // 1 hour between notifications
     private let frequentVisitThreshold: Int = 5 // Number of visits to consider a venue as frequently visited
     private let ignoreRadius: CLLocationDistance = 50 // 50 meters
+    private let significantDistance: CLLocationDistance = 50 // 50 meters to be considered a significant move
     
     private override init() {
         self.locationManager = CLLocationManager()
@@ -86,13 +90,27 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func startMonitoring() {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.startUpdatingLocation()
-        }
+        isMonitoring = true
+        checkLocationAuthorization()
     }
     
     func stopMonitoring() {
+        isMonitoring = false
         locationManager.stopUpdatingLocation()
+    }
+    
+    private func checkLocationAuthorization() {
+        switch locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationManager.startUpdatingLocation()
+        case .notDetermined:
+            locationManager.requestAlwaysAuthorization()
+        case .restricted, .denied:
+            // Handle the case where the user has denied location access
+            print("Location access is restricted or denied")
+        @unknown default:
+            break
+        }
     }
     
     func requestOneTimeLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
@@ -108,7 +126,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         if let completion = oneTimeLocationCompletion {
             completion(.success(location))
             oneTimeLocationCompletion = nil
-        } else {
+        } else if isMonitoring {
             processLocationUpdate(location)
         }
     }
@@ -122,45 +140,53 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch manager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            print("Location authorization granted")
-            startMonitoring()
-        case .denied, .restricted:
-            print("Location authorization denied")
-            stopMonitoring()
-        case .notDetermined:
-            print("Location authorization not determined")
-        @unknown default:
-            print("Unknown authorization status")
-        }
+        checkLocationAuthorization()
     }
     
     // MARK: - Google Places API Methods
     
     private func processLocationUpdate(_ location: CLLocation) {
+        // Check if enough time has passed since the last notification
+        if let lastTime = lastNotificationTime, Date().timeIntervalSince(lastTime) < notificationCooldown {
+            return
+        }
+        
         // Check if the user is moving too fast
         if location.speed > speedThreshold {
-            resetCurrentVenue()
+            resetStayData()
+            return
+        }
+        
+        // Check if this is a significant move from the last recorded location
+        if let lastLocation = lastSignificantLocation,
+           location.distance(from: lastLocation) > significantDistance {
+            resetStayData()
+            lastSignificantLocation = location
+            stayStartTime = Date()
+            return
+        }
+        
+        // If this is the first update or after a reset
+        if lastSignificantLocation == nil {
+            lastSignificantLocation = location
+            stayStartTime = Date()
             return
         }
         
         // Check if the user has been in the same location for long enough
-        if let arrivalTime = currentVenueArrivalTime {
-            if Date().timeIntervalSince(arrivalTime) >= minimumStayDuration {
-                checkNearbyPlaces(location: location)
-            }
-        } else {
-            if let lastLocation = lastCheckedLocation, location.distance(from: lastLocation) > 50 {
-                resetCurrentVenue()
-                currentVenueArrivalTime = Date()
-            } else if currentVenueArrivalTime == nil {
-                currentVenueArrivalTime = Date()
-            }
+        if let startTime = stayStartTime,
+           Date().timeIntervalSince(startTime) >= minimumStayDuration {
+            checkNearbyPlaces(location: location)
+            // Reset after checking to prevent repeated checks
+            resetStayData()
         }
-        
-        lastCheckedLocation = location
     }
+    
+    private func resetStayData() {
+        lastSignificantLocation = nil
+        stayStartTime = nil
+    }
+    
     
     private func checkNearbyPlaces(location: CLLocation) {
         // First, check if the current location is within any ignored location's radius
@@ -182,6 +208,8 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             CLLocationCoordinate2D(latitude: location.coordinate.latitude + 0.001, longitude: location.coordinate.longitude + 0.001)
         )
         
+        print("Making request to Google Places API: findPlaceLikelihoodsFromCurrentLocation")
+        
         placesClient.findPlaceLikelihoodsFromCurrentLocation(withPlaceFields: [.name, .placeID, .types]) { [weak self] (placeLikelihoods, error) in
             guard let self = self, error == nil else {
                 print("Error finding nearby places: \(error?.localizedDescription ?? "Unknown error")")
@@ -193,11 +221,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
                 if let placeType = place.types?.first,
                    placeTypes.contains(placeType) {
                     self.handleDetectedPlace(place)
-                } else {
-                    self.resetCurrentVenue()
                 }
-            } else {
-                self.resetCurrentVenue()
             }
         }
     }
@@ -214,15 +238,13 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             return
         }
         
-        // Check if we've already notified about this venue today
+        // Check if we've already notified about this venue recently
         if let lastNotificationDate = notifiedVenues[placeId],
            Date().timeIntervalSince(lastNotificationDate) < venueCooldown {
             return
         }
         
-        // This is a new venue or we haven't notified about it today
-        resetCurrentVenue()
-        currentVenueArrivalTime = Date()
+        // This is a new venue or we haven't notified about it recently
         sendNotification(for: place)
         
         persistData()
@@ -251,12 +273,10 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
                 print("Error sending notification: \(error.localizedDescription)")
             } else {
                 self.notifiedVenues[placeId] = Date()
+                self.lastNotificationTime = Date()
+                self.resetStayData() // Use the new resetStayData function instead of resetCurrentVenue
             }
         }
-    }
-    
-    private func resetCurrentVenue() {
-        currentVenueArrivalTime = nil
     }
     
     // MARK: - Ignored Locations Management
