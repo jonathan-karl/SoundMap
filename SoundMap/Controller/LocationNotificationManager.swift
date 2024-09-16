@@ -91,21 +91,6 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func startMonitoring() {
-        
-#if DEBUG
-        print("Resetting LocationNotificationManager for testing...")
-        frequentlyVisitedVenues.removeAll()
-        notifiedVenues.removeAll()
-        ignoredLocations.removeAll()
-        lastNotificationTime = nil
-        stayStartTime = nil
-        lastSignificantLocation = nil
-        UserDefaults.standard.removeObject(forKey: "FrequentlyVisitedVenues")
-        UserDefaults.standard.removeObject(forKey: "IgnoredLocations")
-        print("LocationNotificationManager reset complete.")
-#endif
-        
-        
         isMonitoring = true
         checkLocationAuthorization()
     }
@@ -231,7 +216,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             }
         }
         
-        let placeTypes = ["restaurant", "cafe", "bar", "lodging"]
+        let placeTypes = ["restaurant", "cafe", "bar"]
         
         let filter = GMSAutocompleteFilter()
         filter.type = .establishment
