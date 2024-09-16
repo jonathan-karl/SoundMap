@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import GoogleAnalytics
 
 struct IgnoredLocationsView: View {
     @State private var ignoredLocations: [IgnoredLocation] = []
@@ -89,6 +90,17 @@ struct IgnoredLocationsView: View {
                 switch result {
                 case .success(let location):
                     LocationNotificationManager.shared.addIgnoredLocation(name: newLocationName, coordinate: location.coordinate)
+                    
+                    // Track new ignored location
+                    if let tracker = GAI.sharedInstance().defaultTracker {
+                        tracker.send(GAIDictionaryBuilder.createEvent(
+                            withCategory: "User Action",
+                            action: "Add Ignored Location",
+                            label: newLocationName,
+                            value: nil
+                        ).build() as [NSObject : AnyObject])
+                    }
+                    
                     newLocationName = ""
                     loadLocations()
                 case .failure(let error):

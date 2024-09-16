@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import FirebaseCore
 import FirebaseFirestore
+import GoogleAnalytics
 
 class UploadViewController: UIViewController {
     
@@ -40,6 +41,16 @@ class UploadViewController: UIViewController {
     
     
     @IBAction func uploadPressed(_ sender: UIButton) {
+        
+        // Track button press event
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "User Action",
+                action: "Tap",
+                label: "Upload",
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        }
         
         uploadProgressView.isHidden = false
         uploadMetadata()

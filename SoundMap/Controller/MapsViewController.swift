@@ -11,6 +11,7 @@ import GoogleMaps
 import GoogleMapsUtils
 import FirebaseFirestore
 import SafariServices
+import GoogleAnalytics
 
 class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, GMUClusterManagerDelegate {
     
@@ -206,6 +207,17 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     
     
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
+        
+        // Track marker tap event
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "Map Interaction",
+                action: "Tap",
+                label: "Map Pin",
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        }
+        
         if let _ = marker.userData as? GMUCluster {
             // Let the cluster manager handle cluster taps
             return false
@@ -348,6 +360,17 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     private func openInGoogleMaps(placeName: String, latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        
+        // Track Google Maps button tap event
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "User Action",
+                action: "Tap",
+                label: "Open in Google Maps",
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        }
+        
         let encodedName = placeName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://www.google.com/maps/search/?api=1&query=\(encodedName)&query_place_id=\(latitude),\(longitude)"
         
@@ -357,6 +380,17 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     private func shareVenueInfo(venueData: VenueNoiseData) {
+        
+        // Track Share button tap event
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "User Action",
+                action: "Tap",
+                label: "Share Venue Info",
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        }
+        
         let shareText = """
             Check out the noise levels at \(venueData.venueName)!
             Noise Level: \(venueData.noiseLevel) dB

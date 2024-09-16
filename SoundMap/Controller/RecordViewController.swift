@@ -9,6 +9,7 @@ import AVFoundation
 import GooglePlaces
 import GoogleMaps
 import CoreLocation
+import GoogleAnalytics
 
 class RecordViewController: UIViewController, CLLocationManagerDelegate {
     
@@ -39,7 +40,20 @@ class RecordViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     @IBAction func recordNewEntryGoPressed(_ sender: UIButton) {
-        print("Record New Entry button pressed")
+        print("Record New Entry button pressed")        
+        // Track button press event
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            print("Attempting to send event: Category - User Action, Action - Tap, Label - Record New Entry")
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "User Action",
+                action: "Tap",
+                label: "Record New Entry",
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        } else {
+            print("Failed to get default tracker")
+        }
+        
         self.performSegue(withIdentifier: "recordGo", sender: self)
     }
     

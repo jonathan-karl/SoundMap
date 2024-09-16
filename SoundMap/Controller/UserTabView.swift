@@ -1,6 +1,7 @@
 import SwiftUI
 import UserNotifications
 import CoreLocation
+import GoogleAnalytics
 
 class UserViewModel: ObservableObject {
     @Published var notificationStatus: String = "Checking..."
@@ -27,6 +28,17 @@ class UserViewModel: ObservableObject {
                 @unknown default:
                     self.notificationStatus = "Unknown"
                 }
+                
+                // Track notification status
+                if let tracker = GAI.sharedInstance().defaultTracker {
+                    tracker.send(GAIDictionaryBuilder.createEvent(
+                        withCategory: "User Status",
+                        action: "Notification Status",
+                        label: self.notificationStatus,
+                        value: nil
+                    ).build() as [NSObject : AnyObject])
+                }
+                
             }
         }
     }
@@ -44,6 +56,17 @@ class UserViewModel: ObservableObject {
         @unknown default:
             locationStatus = "Unknown"
         }
+        
+        // Track location status
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "User Status",
+                action: "Location Status",
+                label: locationStatus,
+                value: nil
+            ).build() as [NSObject : AnyObject])
+        }
+        
     }
 }
 
