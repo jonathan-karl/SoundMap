@@ -66,7 +66,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     private let speedThreshold: CLLocationSpeed = 2.0 // m/s, roughly walking speed
     private let venueCooldown: TimeInterval = 86400 // 1 day cooldown per venue
     private let notificationCooldown: TimeInterval = 3600 // 1 hour between notifications
-    private let frequentVisitThreshold: Int = 5 // Number of visits to consider a venue as frequently visited
+    private let frequentVisitThreshold: Int = 3 // Number of visits to consider a venue as frequently visited
     private let ignoreRadius: CLLocationDistance = 50 // 50 meters
     private let significantDistance: CLLocationDistance = 50 // 50 meters to be considered a significant move
     
@@ -81,6 +81,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         loadPersistedData()
     }
     
+    
     func configure() {
         // This method can be used for any additional setup if needed
     }
@@ -90,6 +91,21 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func startMonitoring() {
+        
+#if DEBUG
+        print("Resetting LocationNotificationManager for testing...")
+        frequentlyVisitedVenues.removeAll()
+        notifiedVenues.removeAll()
+        ignoredLocations.removeAll()
+        lastNotificationTime = nil
+        stayStartTime = nil
+        lastSignificantLocation = nil
+        UserDefaults.standard.removeObject(forKey: "FrequentlyVisitedVenues")
+        UserDefaults.standard.removeObject(forKey: "IgnoredLocations")
+        print("LocationNotificationManager reset complete.")
+#endif
+        
+        
         isMonitoring = true
         checkLocationAuthorization()
     }
@@ -112,6 +128,22 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             break
         }
     }
+    
+    func checkNotificationPermissions() {
+            self.notificationCenter.getNotificationSettings { settings in
+                print("Notification settings: \(settings)")
+                switch settings.authorizationStatus {
+                case .authorized, .provisional:
+                    print("Notifications are enabled")
+                case .denied:
+                    print("Notifications are disabled")
+                case .notDetermined:
+                    print("Notification permission not determined")
+                @unknown default:
+                    print("Unknown notification authorization status")
+                }
+            }
+        }
     
     func requestOneTimeLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
         oneTimeLocationCompletion = completion
@@ -218,6 +250,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             
             if let placeLikelihood = placeLikelihoods?.first {
                 let place = placeLikelihood.place
+                print(place)
                 if let placeType = place.types?.first,
                    placeTypes.contains(placeType) {
                     self.handleDetectedPlace(place)
@@ -231,12 +264,16 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         
         // Increment visit count for this venue
         frequentlyVisitedVenues[placeId, default: 0] += 1
+        print("frequentlyVisitedVenues:", frequentlyVisitedVenues)
         
         // Check if this is a frequently visited venue
         if frequentlyVisitedVenues[placeId, default: 0] >= frequentVisitThreshold {
             // Don't send notification for frequently visited venues
             return
         }
+        
+        
+        print("NotifiedVenues:", notifiedVenues)
         
         // Check if we've already notified about this venue recently
         if let lastNotificationDate = notifiedVenues[placeId],
@@ -266,15 +303,31 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         content.sound = .default
         content.userInfo = ["placeId": placeId]
         
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        // Create a trigger for immediate presentation
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
-        notificationCenter.add(request) { error in
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        
+        print("Attempting to send notification for place: \(place.name ?? "Unknown"), ID: \(placeId)")
+        
+        self.notificationCenter.add(request) { error in
             if let error = error {
                 print("Error sending notification: \(error.localizedDescription)")
             } else {
                 self.notifiedVenues[placeId] = Date()
                 self.lastNotificationTime = Date()
-                self.resetStayData() // Use the new resetStayData function instead of resetCurrentVenue
+                self.resetStayData()
+                print("Notification request added successfully for place: \(place.name ?? "Unknown")")
+                
+                // Check pending notifications
+                self.notificationCenter.getPendingNotificationRequests { requests in
+                    print("Pending notification requests: \(requests.count)")
+                }
+                
+                // Check notification settings
+                self.notificationCenter.getNotificationSettings { settings in
+                    print("Notification settings: \(settings)")
+                }
             }
         }
     }
