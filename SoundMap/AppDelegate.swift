@@ -13,11 +13,14 @@ import FirebaseFirestore
 import Firebase
 import FirebaseAuth
 import GoogleSignIn
+import CoreData
+import GoogleAnalytics
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var locationManager: LocationNotificationManager?
+    var tracker: GAITracker?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -28,6 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Configure Firebase
         FirebaseApp.configure()
         
+        // Configure Google Analytics
+        // Configure Google Analytics
+        let gai = GAI.sharedInstance()
+        gai?.tracker(withTrackingId: "G-WGM7F7BER0")
+        // Optional: configure GAI options
+        gai?.trackUncaughtExceptions = true  // Report uncaught exceptions
+        gai?.logger.logLevel = .verbose  // Remove before app release
+        
         // Force light mode for the entire app
         setAppearanceForAllScenes()
         
@@ -37,7 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         locationManager.requestLocationPermissions()
         locationManager.startMonitoring()
         
-        
+        // Check notification permission status
+        LocationNotificationManager.shared.checkNotificationPermissions()
         
         return true
     }
