@@ -15,7 +15,7 @@ target 'SoundMap' do
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
   pod 'FirebaseFirestore'
-  pod 'FirebaseAnalytics'
+  pod 'Firebase/Analytics'
   pod 'FirebaseStorage'
   pod 'Charts'
 end
