@@ -1056,6 +1056,8 @@ PODS:
     - GoogleMaps
   - Google-Maps-iOS-Utils/QuadTree (4.1.0):
     - GoogleMaps
+  - GoogleAnalytics (3.23.0):
+    - GoogleUtilities/UserDefaults (~> 7.11)
   - GoogleAppMeasurement (10.24.0):
     - GoogleAppMeasurement/AdIdSupport (= 10.24.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
@@ -1214,6 +1216,7 @@ DEPENDENCIES:
   - FirebaseFirestore
   - FirebaseStorage
   - Google-Maps-iOS-Utils
+  - GoogleAnalytics
   - GoogleMaps (= 8.4.0)
   - GooglePlaces
   - GoogleSignIn
@@ -1238,6 +1241,7 @@ SPEC REPOS:
     - FirebaseSharedSwift
     - FirebaseStorage
     - Google-Maps-iOS-Utils
+    - GoogleAnalytics
     - GoogleAppMeasurement
     - GoogleMaps
     - GooglePlaces
@@ -1272,6 +1276,7 @@ SPEC CHECKSUMS:
   FirebaseSharedSwift: 76e1529c32101d80e4f1ca2fba7c39d59f0a390a
   FirebaseStorage: 03710f9a0e3824d3069ed1128601a3d3a5e7d817
   Google-Maps-iOS-Utils: 3343332b18dfd5be8f1f44edd7d481ace3da4d9a
+  GoogleAnalytics: 9e360c5cfffa536ff64dc383bc468577b7ba5c5d
   GoogleAppMeasurement: f3abf08495ef2cba7829f15318c373b8d9226491
   GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
   GooglePlaces: 426efb69051e7b460e16300ba63598687d10fa1a
@@ -1287,6 +1292,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   SwiftAlgorithms: 38dda4731d19027fdeee1125f973111bf3386b53
 
-PODFILE CHECKSUM: 3756f4ae19578532be1d1fb75ec8cdd520d496fa
+PODFILE CHECKSUM: f014abbbe05f75cb9fcddc81645128c9ff54fc3f
 
 COCOAPODS: 1.15.2
