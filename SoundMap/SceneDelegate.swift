@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import UserNotifications
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -27,32 +28,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window?.rootViewController = UIHostingController(rootView: launchScreen)
         window?.makeKeyAndVisible()
-    }
-    
-    private func transitionToMainApp() {
-        guard let window = self.window else { return }
         
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let tabBarController = storyboard.instantiateInitialViewController() as! UITabBarController
-        
-        // Set tab bar appearance
-        if #available(iOS 15.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .white
-            tabBarController.tabBar.standardAppearance = appearance
-            tabBarController.tabBar.scrollEdgeAppearance = tabBarController.tabBar.standardAppearance
-        } else {
-            tabBarController.tabBar.barTintColor = .white
-        }
-        
-        // Ensure light mode is set for the tab bar controller
-        tabBarController.overrideUserInterfaceStyle = .light
-        
-        // Perform the transition
-        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
-            window.rootViewController = tabBarController
-        }, completion: nil)
+        // Request notification permissions
+        requestNotificationAuthorization()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -83,6 +61,46 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
     
+    private func transitionToMainApp() {
+        guard let window = self.window else { return }
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let tabBarController = storyboard.instantiateInitialViewController() as! UITabBarController
+        
+        // Set tab bar appearance
+        if #available(iOS 15.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .white
+            tabBarController.tabBar.standardAppearance = appearance
+            tabBarController.tabBar.scrollEdgeAppearance = tabBarController.tabBar.standardAppearance
+        } else {
+            tabBarController.tabBar.barTintColor = .white
+        }
+        
+        // Ensure light mode is set for the tab bar controller
+        tabBarController.overrideUserInterfaceStyle = .light
+        
+        // Perform the transition
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            window.rootViewController = tabBarController
+        }, completion: nil)
+        
+        
+        // Register for remote notifications
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
+        
+    }
     
+    private func requestNotificationAuthorization() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                print("Notification authorization granted")
+            } else {
+                print("Notification authorization denied")
+            }
+        }
+    }
 }
-

@@ -44,17 +44,22 @@ class UserViewModel: ObservableObject {
     }
     
     func checkLocationStatus() {
+        let status: String
         switch locationManager.authorizationStatus {
         case .authorizedAlways:
-            locationStatus = "Always"
+            status = "Always"
         case .authorizedWhenInUse:
-            locationStatus = "When in Use"
+            status = "When in Use"
         case .denied, .restricted:
-            locationStatus = "Disabled"
+            status = "Disabled"
         case .notDetermined:
-            locationStatus = "Not Determined"
+            status = "Not Determined"
         @unknown default:
-            locationStatus = "Unknown"
+            status = "Unknown"
+        }
+        
+        DispatchQueue.main.async {
+            self.locationStatus = status
         }
         
         // Track location status
@@ -62,11 +67,10 @@ class UserViewModel: ObservableObject {
             tracker.send(GAIDictionaryBuilder.createEvent(
                 withCategory: "User Status",
                 action: "Location Status",
-                label: locationStatus,
+                label: status,
                 value: nil
             ).build() as [NSObject : AnyObject])
         }
-        
     }
 }
 
@@ -160,6 +164,10 @@ struct UserTabView: View {
                 .font(.headline)
                 .foregroundColor(.primary)
             
+            Text("Ignored locations are places where you don't want to receive noise recording prompts. Use this feature for your home, office, or any regular spots where you prefer not to be notified.")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
             NavigationLink(destination: IgnoredLocationsView()) {
                 HStack {
                     Text("Manage Ignored Locations")
@@ -181,11 +189,17 @@ struct UserTabView: View {
             UIColor(red: 0, green: 0.6, blue: 0, alpha: 1)    // Lighter green for light mode
         })
         
+        let redColor = Color(UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ?
+            UIColor(red: 1, green: 0.2, blue: 0.2, alpha: 1) :  // Brighter red for dark mode
+            UIColor(red: 0.8, green: 0, blue: 0, alpha: 1)      // Darker red for light mode
+        })
+        
         switch status {
         case "Enabled", "Always":
             return greenColor
         default:
-            return .secondary
+            return redColor
         }
     }
     

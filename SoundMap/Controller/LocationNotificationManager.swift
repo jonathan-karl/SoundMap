@@ -52,7 +52,6 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     private let placesClient = GMSPlacesClient.shared()
     
     private var isMonitoring = false
-    
     private var lastSignificantLocation: CLLocation?
     private var stayStartTime: Date?
     private var notifiedVenues: [String: Date] = [:]
@@ -84,6 +83,8 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     
     func configure() {
         // This method can be used for any additional setup if needed
+        requestLocationPermissions()
+        requestNotificationPermissions()
     }
     
     func requestLocationPermissions() {
@@ -98,37 +99,47 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     func stopMonitoring() {
         isMonitoring = false
         locationManager.stopUpdatingLocation()
+        locationManager.stopMonitoringSignificantLocationChanges()
+        print("Stopped monitoring significant location changes")
     }
     
     private func checkLocationAuthorization() {
         switch locationManager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
+        case .authorizedAlways:
+            print("Always authorization granted")
             locationManager.startUpdatingLocation()
+            locationManager.startMonitoringSignificantLocationChanges()
+        case .authorizedWhenInUse:
+            print("When in use authorization granted")
+            locationManager.startUpdatingLocation()
+            // We can't use significant location changes with "when in use" authorization
         case .notDetermined:
+            print("Location authorization not determined")
             locationManager.requestAlwaysAuthorization()
         case .restricted, .denied:
-            // Handle the case where the user has denied location access
             print("Location access is restricted or denied")
+            stopMonitoring()
         @unknown default:
-            break
+            print("Unknown authorization status")
+            stopMonitoring()
         }
     }
     
     func checkNotificationPermissions() {
-            self.notificationCenter.getNotificationSettings { settings in
-                print("Notification settings: \(settings)")
-                switch settings.authorizationStatus {
-                case .authorized, .provisional:
-                    print("Notifications are enabled")
-                case .denied:
-                    print("Notifications are disabled")
-                case .notDetermined:
-                    print("Notification permission not determined")
-                @unknown default:
-                    print("Unknown notification authorization status")
-                }
+        self.notificationCenter.getNotificationSettings { settings in
+            print("Notification settings: \(settings)")
+            switch settings.authorizationStatus {
+            case .authorized, .provisional:
+                print("Notifications are enabled")
+            case .denied:
+                print("Notifications are disabled")
+            case .notDetermined:
+                print("Notification permission not determined")
+            @unknown default:
+                print("Unknown notification authorization status")
             }
         }
+    }
     
     func requestOneTimeLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
         oneTimeLocationCompletion = completion
@@ -138,12 +149,16 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - CLLocationManagerDelegate
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard isMonitoring, locationManager.authorizationStatus == .authorizedAlways || locationManager.authorizationStatus == .authorizedWhenInUse else {
+            return
+        }
+        
         guard let location = locations.last else { return }
         
         if let completion = oneTimeLocationCompletion {
             completion(.success(location))
             oneTimeLocationCompletion = nil
-        } else if isMonitoring {
+        } else {
             processLocationUpdate(location)
         }
     }
@@ -358,7 +373,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - Notification Methods
     
     func requestNotificationPermissions() {
-        notificationCenter.requestAuthorization(options: [.alert, .sound]) { granted, error in
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if granted {
                 print("Notification permissions granted")
             } else if let error = error {

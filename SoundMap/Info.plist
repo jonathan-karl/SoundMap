@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key></key>
+	<string></string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -13,6 +15,8 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>864853662106-mmgf214p6c79decm7jtnj2da1uea8mj5.apps.googleusercontent.com</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>This app sends you notifcation if you would like to remind you to submit a Sound review.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

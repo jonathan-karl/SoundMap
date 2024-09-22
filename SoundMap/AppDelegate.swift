@@ -15,9 +15,10 @@ import FirebaseAuth
 import GoogleSignIn
 import CoreData
 import GoogleAnalytics
+import UserNotifications
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     var locationManager: LocationNotificationManager?
     var tracker: GAITracker?
@@ -32,7 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         
         // Configure Google Analytics
-        // Configure Google Analytics
         let gai = GAI.sharedInstance()
         gai?.tracker(withTrackingId: "G-WGM7F7BER0")
         // Optional: configure GAI options
@@ -43,13 +43,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setAppearanceForAllScenes()
         
         // Configure LocationNotificationManager
-        let locationManager = LocationNotificationManager.shared
-        locationManager.configure()
-        locationManager.requestLocationPermissions()
-        locationManager.startMonitoring()
+        locationManager = LocationNotificationManager.shared
+        locationManager?.configure()
+        locationManager?.startMonitoring()
         
         // Check notification permission status
         LocationNotificationManager.shared.checkNotificationPermissions()
+        
+        // Request notification authorization
+        requestNotificationAuthorization()
+        
+        
+        // If the app was launched due to a significant location change
+        if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
+           locationKey.boolValue {
+            print("App launched due to significant location change")
+            // The locationManager will check authorization before actually monitoring
+            locationManager?.startMonitoring()
+        }
+        
+        UNUserNotificationCenter.current().delegate = self
         
         return true
     }
@@ -78,6 +91,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return GIDSignIn.sharedInstance.handle(url)
     }
     
+    
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
            let incomingURL = userActivity.webpageURL,
@@ -97,6 +111,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         return false
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+        let token = tokenParts.joined()
+        print("Device Token: \(token)")
+        // Here you would typically send this token to your server
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register for remote notifications: \(error)")
+    }
+    
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        // Called when the application is about to terminate. Save data if appropriate.
+        locationManager?.stopMonitoring()
+    }
+    
+    func requestNotificationAuthorization() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                print("Notification authorization granted")
+            } else {
+                print("Notification authorization denied")
+            }
+        }
     }
     
     private func openVenueInApp(venueID: String) -> Bool {
@@ -127,5 +168,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    // MARK: - UNUserNotificationCenterDelegate Methods
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound, .badge])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        // Handle the received notification
+        let userInfo = response.notification.request.content.userInfo
+        if let placeId = userInfo["placeId"] as? String {
+            print("Notification tapped for place: \(placeId)")
+            // Here you can add logic to open the relevant part of your app
+        }
+        completionHandler()
+    }
     
 }

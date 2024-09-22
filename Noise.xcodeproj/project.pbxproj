@@ -53,6 +53,7 @@
 		AB9831702B7F8738009DAEC3 /* MoreInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreInfoViewController.swift; sourceTree = "<group>"; };
 		ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstablishmentSelectorViewController.swift; sourceTree = "<group>"; };
 		ABA2BCDA2B7A012400257211 /* RecordAudioViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAudioViewController.swift; sourceTree = "<group>"; };
+		ABD0CE622CA0A412009713C0 /* SoundMap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SoundMap.entitlements; sourceTree = "<group>"; };
 		ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTabView.swift; sourceTree = "<group>"; };
 		ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTabViewController.swift; sourceTree = "<group>"; };
 		ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredLocationsView.swift; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 		AB8D8E202B7950D30074520B /* SoundMap */ = {
 			isa = PBXGroup;
 			children = (
+				ABD0CE622CA0A412009713C0 /* SoundMap.entitlements */,
 				AB8D8E212B7950D30074520B /* AppDelegate.swift */,
 				AB8D8E232B7950D30074520B /* SceneDelegate.swift */,
 				AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */,
@@ -437,6 +439,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SoundMap/SoundMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7L44D7469D;
@@ -458,7 +461,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsk.SoundMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -477,6 +480,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SoundMap/SoundMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7L44D7469D;
@@ -498,7 +502,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jsk.SoundMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
