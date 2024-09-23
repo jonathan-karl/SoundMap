@@ -60,6 +60,9 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     private var lastNotificationTime: Date?
     private var oneTimeLocationCompletion: ((Result<CLLocation, Error>) -> Void)?
     
+    private let minimumUpdateInterval: TimeInterval = 300 // 5 minutes for background app fetches
+    private var lastUpdateTime: Date?
+    
     private let minimumStayDuration: TimeInterval = 300 // 5 minutes
     private let maxDailyNotifications: Int = 5
     private let speedThreshold: CLLocationSpeed = 2.0 // m/s, roughly walking speed
@@ -74,8 +77,8 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         super.init()
         
         self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.distanceFilter = kCLDistanceFilterNone
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        self.locationManager.distanceFilter = 100 // Update every 100 meters
         
         loadPersistedData()
     }
@@ -96,23 +99,14 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         checkLocationAuthorization()
     }
     
-    func stopMonitoring() {
-        isMonitoring = false
-        locationManager.stopUpdatingLocation()
-        locationManager.stopMonitoringSignificantLocationChanges()
-        print("Stopped monitoring significant location changes")
-    }
-    
     private func checkLocationAuthorization() {
         switch locationManager.authorizationStatus {
         case .authorizedAlways:
             print("Always authorization granted")
-            locationManager.startUpdatingLocation()
-            locationManager.startMonitoringSignificantLocationChanges()
+            startContinuousLocationUpdates()
         case .authorizedWhenInUse:
             print("When in use authorization granted")
-            locationManager.startUpdatingLocation()
-            // We can't use significant location changes with "when in use" authorization
+            locationManager.requestAlwaysAuthorization()
         case .notDetermined:
             print("Location authorization not determined")
             locationManager.requestAlwaysAuthorization()
@@ -126,19 +120,22 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     func checkNotificationPermissions() {
-        self.notificationCenter.getNotificationSettings { settings in
+        notificationCenter.getNotificationSettings { settings in
             print("Notification settings: \(settings)")
-            switch settings.authorizationStatus {
-            case .authorized, .provisional:
-                print("Notifications are enabled")
-            case .denied:
-                print("Notifications are disabled")
-            case .notDetermined:
-                print("Notification permission not determined")
-            @unknown default:
-                print("Unknown notification authorization status")
-            }
         }
+    }
+    
+    private func startContinuousLocationUpdates() {
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = true
+        locationManager.startUpdatingLocation()
+        print("Continuous location updates started")
+    }
+    
+    func stopMonitoring() {
+        isMonitoring = false
+        locationManager.stopUpdatingLocation()
+        print("Location monitoring stopped")
     }
     
     func requestOneTimeLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
@@ -149,18 +146,17 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - CLLocationManagerDelegate
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard isMonitoring, locationManager.authorizationStatus == .authorizedAlways || locationManager.authorizationStatus == .authorizedWhenInUse else {
+        guard isMonitoring, let location = locations.last else { return }
+        
+        let currentTime = Date()
+        if let lastUpdate = lastUpdateTime,
+           currentTime.timeIntervalSince(lastUpdate) < minimumUpdateInterval {
+            // Skip this update if it's too soon after the last one
             return
         }
         
-        guard let location = locations.last else { return }
-        
-        if let completion = oneTimeLocationCompletion {
-            completion(.success(location))
-            oneTimeLocationCompletion = nil
-        } else {
-            processLocationUpdate(location)
-        }
+        processLocationUpdate(location)
+        lastUpdateTime = currentTime
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -220,13 +216,21 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     }
     
     
-    private func checkNearbyPlaces(location: CLLocation) {
+    func checkNearbyPlaces(location: CLLocation? = nil, completion: ((UIBackgroundFetchResult) -> Void)? = nil) {
+        let locationToUse = location ?? locationManager.location
+        
+        guard let currentLocation = locationToUse else {
+            completion?(.noData)
+            return
+        }
+        
         // First, check if the current location is within any ignored location's radius
         for ignoredLocation in ignoredLocations {
             let ignoredCoordinate = ignoredLocation.coordinate
             let ignoredLocation = CLLocation(latitude: ignoredCoordinate.latitude, longitude: ignoredCoordinate.longitude)
-            if location.distance(from: ignoredLocation) <= ignoreRadius {
-                // User is within an ignored location, don't send any notifications
+            if currentLocation.distance(from: ignoredLocation) <= ignoreRadius {
+                // User is within an ignored location, don't proceed
+                completion?(.noData)
                 return
             }
         }
@@ -236,25 +240,31 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
         let filter = GMSAutocompleteFilter()
         filter.type = .establishment
         filter.locationRestriction = GMSPlaceRectangularLocationOption(
-            CLLocationCoordinate2D(latitude: location.coordinate.latitude - 0.001, longitude: location.coordinate.longitude - 0.001),
-            CLLocationCoordinate2D(latitude: location.coordinate.latitude + 0.001, longitude: location.coordinate.longitude + 0.001)
+            CLLocationCoordinate2D(latitude: currentLocation.coordinate.latitude - 0.001, longitude: currentLocation.coordinate.longitude - 0.001),
+            CLLocationCoordinate2D(latitude: currentLocation.coordinate.latitude + 0.001, longitude: currentLocation.coordinate.longitude + 0.001)
         )
         
         print("Making request to Google Places API: findPlaceLikelihoodsFromCurrentLocation")
         
         placesClient.findPlaceLikelihoodsFromCurrentLocation(withPlaceFields: [.name, .placeID, .types]) { [weak self] (placeLikelihoods, error) in
-            guard let self = self, error == nil else {
-                print("Error finding nearby places: \(error?.localizedDescription ?? "Unknown error")")
+            guard let self = self else {
+                completion?(.failed)
                 return
             }
             
-            if let placeLikelihood = placeLikelihoods?.first {
-                let place = placeLikelihood.place
-                print(place)
-                if let placeType = place.types?.first,
-                   placeTypes.contains(placeType) {
-                    self.handleDetectedPlace(place)
-                }
+            if let error = error {
+                print("Error finding nearby places: \(error.localizedDescription)")
+                completion?(.failed)
+                return
+            }
+            
+            if let placeLikelihood = placeLikelihoods?.first,
+               let placeType = placeLikelihood.place.types?.first,
+               placeTypes.contains(placeType) {
+                self.handleDetectedPlace(placeLikelihood.place)
+                completion?(.newData)
+            } else {
+                completion?(.noData)
             }
         }
     }
@@ -272,12 +282,17 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
             return
         }
         
-        
         print("NotifiedVenues:", notifiedVenues)
         
         // Check if we've already notified about this venue recently
         if let lastNotificationDate = notifiedVenues[placeId],
            Date().timeIntervalSince(lastNotificationDate) < venueCooldown {
+            return
+        }
+        
+        // Check if we've reached the daily notification limit
+        if notifiedVenues.count >= maxDailyNotifications {
+            print("Daily notification limit reached")
             return
         }
         

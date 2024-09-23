@@ -16,12 +16,15 @@ import GoogleSignIn
 import CoreData
 import GoogleAnalytics
 import UserNotifications
+import BackgroundTasks
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     var locationManager: LocationNotificationManager?
     var tracker: GAITracker?
+    
+    private let backgroundTaskIdentifier = "com.jsk.SoundMap.fetchNoiseData"
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -33,11 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         FirebaseApp.configure()
         
         // Configure Google Analytics
-        let gai = GAI.sharedInstance()
-        gai?.tracker(withTrackingId: "G-WGM7F7BER0")
-        // Optional: configure GAI options
-        gai?.trackUncaughtExceptions = true  // Report uncaught exceptions
-        gai?.logger.logLevel = .verbose  // Remove before app release
+        configureGoogleAnalytics()
         
         // Force light mode for the entire app
         setAppearanceForAllScenes()
@@ -53,12 +52,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Request notification authorization
         requestNotificationAuthorization()
         
+        // Register background task
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundTaskIdentifier, using: nil) { task in
+            self.handleAppRefresh(task: task as! BGAppRefreshTask)
+        }
         
         // If the app was launched due to a significant location change
         if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
            locationKey.boolValue {
             print("App launched due to significant location change")
-            // The locationManager will check authorization before actually monitoring
             locationManager?.startMonitoring()
         }
         
@@ -130,6 +132,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         locationManager?.stopMonitoring()
     }
     
+    private func configureGoogleAnalytics() {
+        // Configure Google Analytics
+        guard let gai = GAI.sharedInstance() else {
+            print("Failed to get GAI shared instance")
+            return
+        }
+        
+        do {
+            // Initialize tracker
+            try tracker = gai.tracker(withTrackingId: "G-PXL9GTML16")
+            
+            // Configure GAI options
+            gai.trackUncaughtExceptions = true
+            gai.logger.logLevel = .verbose  // Set to .error before app release
+            
+            // Send a test event
+            tracker?.send(GAIDictionaryBuilder.createEvent(
+                withCategory: "Test",
+                action: "App Launch",
+                label: nil,
+                value: nil
+            ).build() as [NSObject : AnyObject])
+            
+            print("Google Analytics configured successfully")
+        } catch {
+            print("Error configuring Google Analytics: \(error.localizedDescription)")
+        }
+    }
+    
     func requestNotificationAuthorization() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if granted {
@@ -167,6 +198,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             UIApplication.shared.statusBarStyle = .default
         }
     }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        scheduleAppRefresh()
+    }
+    
+    func scheduleAppRefresh() {
+        let request = BGAppRefreshTaskRequest(identifier: backgroundTaskIdentifier)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 3600) // Fetch no earlier than 1 hour from now
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            print("Could not schedule app refresh: \(error)")
+        }
+    }
+    
+    func handleAppRefresh(task: BGAppRefreshTask) {
+        scheduleAppRefresh() // Schedule the next refresh
+        
+        task.expirationHandler = {
+            // Cancel any ongoing work
+        }
+        
+        locationManager?.checkNearbyPlaces { result in
+            switch result {
+            case .newData:
+                task.setTaskCompleted(success: true)
+            case .noData:
+                task.setTaskCompleted(success: true)
+            case .failed:
+                task.setTaskCompleted(success: false)
+            }
+        }
+    }
+    
     
     // MARK: - UNUserNotificationCenterDelegate Methods
     
