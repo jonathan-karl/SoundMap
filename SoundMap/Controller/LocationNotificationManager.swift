@@ -60,25 +60,27 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     private var lastNotificationTime: Date?
     private var oneTimeLocationCompletion: ((Result<CLLocation, Error>) -> Void)?
     
-    private let minimumUpdateInterval: TimeInterval = 300 // 5 minutes for background app fetches
+    private let minimumUpdateInterval: TimeInterval = 30 // 30 seconds for background app fetches
     private var lastUpdateTime: Date?
     
-    private let minimumStayDuration: TimeInterval = 300 // 5 minutes
+    private let minimumStayDuration: TimeInterval = 180 // 3 minutes
     private let maxDailyNotifications: Int = 5
     private let speedThreshold: CLLocationSpeed = 2.0 // m/s, roughly walking speed
     private let venueCooldown: TimeInterval = 86400 // 1 day cooldown per venue
     private let notificationCooldown: TimeInterval = 3600 // 1 hour between notifications
     private let frequentVisitThreshold: Int = 3 // Number of visits to consider a venue as frequently visited
-    private let ignoreRadius: CLLocationDistance = 50 // 50 meters
-    private let significantDistance: CLLocationDistance = 50 // 50 meters to be considered a significant move
+    private let ignoreRadius: CLLocationDistance = 50// 50 meters
+    private let significantDistance: CLLocationDistance = 25 // 25 meters to be considered a significant move
+    
+    private let logger = NotificationLogger.shared
     
     private override init() {
         self.locationManager = CLLocationManager()
         super.init()
         
         self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        self.locationManager.distanceFilter = 100 // Update every 100 meters
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        self.locationManager.distanceFilter = 10  // Update every 10 meters instead of kCLDistanceFilterNone
         
         loadPersistedData()
     }
@@ -127,7 +129,7 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     
     private func startContinuousLocationUpdates() {
         locationManager.allowsBackgroundLocationUpdates = true
-        locationManager.pausesLocationUpdatesAutomatically = true
+        locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.startUpdatingLocation()
         print("Continuous location updates started")
     }
@@ -146,67 +148,121 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     // MARK: - CLLocationManagerDelegate
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard isMonitoring, let location = locations.last else { return }
-        
-        let currentTime = Date()
-        if let lastUpdate = lastUpdateTime,
-           currentTime.timeIntervalSince(lastUpdate) < minimumUpdateInterval {
-            // Skip this update if it's too soon after the last one
+        guard isMonitoring else {
+            logger.log(.location, "Location update skipped - monitoring disabled")
             return
         }
+        
+        guard let location = locations.last, location.horizontalAccuracy <= 65 else {
+            logger.log(.location, "Location update skipped - poor accuracy")
+            return
+        }
+        
+        let currentTime = Date()
+        if let lastUpdate = lastUpdateTime {
+            let timeSince = currentTime.timeIntervalSince(lastUpdate)
+            if timeSince < minimumUpdateInterval {
+                logger.log(.location, "Location update skipped - too soon (\(Int(timeSince))s < \(minimumUpdateInterval)s)")
+                return
+            }
+        }
+        
+        logger.log(.location, """
+            📍 Processing location update:
+            - Accuracy: \(location.horizontalAccuracy)m
+            - Speed: \(location.speed)m/s
+            - Time since last: \(lastUpdateTime.map { currentTime.timeIntervalSince($0) } ?? 0)s
+            """)
         
         processLocationUpdate(location)
         lastUpdateTime = currentTime
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Location manager failed with error: \(error.localizedDescription)")
-        if let completion = oneTimeLocationCompletion {
-            completion(.failure(error))
-            oneTimeLocationCompletion = nil
+        logger.log(.error, "Location error: \(error.localizedDescription)")
+        
+        if let error = error as? CLError {
+            switch error.code {
+            case .denied:
+                stopMonitoring()
+                logger.log(.error, "Location permissions denied")
+            case .locationUnknown:
+                // Temporary error - keep monitoring
+                logger.log(.error, "Location temporarily unavailable")
+            case .network:
+                // Network-related error
+                logger.log(.error, "Network-related location error")
+            default:
+                logger.log(.error, "Other location error: \(error.code)")
+            }
         }
     }
     
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        checkLocationAuthorization()
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .authorizedAlways:
+            // Enable background location updates
+            locationManager.allowsBackgroundLocationUpdates = true
+            startContinuousLocationUpdates()
+        case .authorizedWhenInUse:
+            // Disable background updates but keep monitoring in foreground
+            locationManager.allowsBackgroundLocationUpdates = false
+            startContinuousLocationUpdates()
+        default:
+            stopMonitoring()
+        }
     }
     
     // MARK: - Google Places API Methods
     
     private func processLocationUpdate(_ location: CLLocation) {
-        // Check if enough time has passed since the last notification
+        let logger = NotificationLogger.shared
+        logger.log(.location, "Processing new location update: \(location.coordinate)")
+        
+        // Check notification cooldown
         if let lastTime = lastNotificationTime, Date().timeIntervalSince(lastTime) < notificationCooldown {
+            logger.log(.notification, "Skipping due to notification cooldown. Next notification allowed in \(notificationCooldown - Date().timeIntervalSince(lastTime)) seconds")
             return
         }
         
-        // Check if the user is moving too fast
+        // Check speed
+        logger.log(.location, "Current speed: \(location.speed) m/s (threshold: \(speedThreshold) m/s)")
         if location.speed > speedThreshold {
+            logger.log(.location, "User moving too fast, resetting stay data")
             resetStayData()
             return
         }
         
-        // Check if this is a significant move from the last recorded location
-        if let lastLocation = lastSignificantLocation,
-           location.distance(from: lastLocation) > significantDistance {
-            resetStayData()
-            lastSignificantLocation = location
-            stayStartTime = Date()
-            return
+        // Check significant movement
+        if let lastLocation = lastSignificantLocation {
+            let distance = location.distance(from: lastLocation)
+            logger.log(.location, "Distance from last significant location: \(distance)m (threshold: \(significantDistance)m)")
+            if distance > significantDistance {
+                logger.log(.stay, "Significant movement detected, resetting stay timer")
+                resetStayData()
+                lastSignificantLocation = location
+                stayStartTime = Date()
+                return
+            }
         }
         
-        // If this is the first update or after a reset
+        // Initialize stay tracking
         if lastSignificantLocation == nil {
+            logger.log(.stay, "Initializing stay tracking at location: \(location.coordinate)")
             lastSignificantLocation = location
             stayStartTime = Date()
             return
         }
         
-        // Check if the user has been in the same location for long enough
-        if let startTime = stayStartTime,
-           Date().timeIntervalSince(startTime) >= minimumStayDuration {
-            checkNearbyPlaces(location: location)
-            // Reset after checking to prevent repeated checks
-            resetStayData()
+        // Check stay duration
+        if let startTime = stayStartTime {
+            let stayDuration = Date().timeIntervalSince(startTime)
+            logger.log(.stay, "Current stay duration: \(stayDuration)s (threshold: \(minimumStayDuration)s)")
+            if stayDuration >= minimumStayDuration {
+                logger.log(.stay, "Minimum stay duration met, checking nearby places")
+                checkNearbyPlaces(location: location)
+                resetStayData()
+            }
         }
     }
     
@@ -217,89 +273,246 @@ class LocationNotificationManager: NSObject, CLLocationManagerDelegate {
     
     
     func checkNearbyPlaces(location: CLLocation? = nil, completion: ((UIBackgroundFetchResult) -> Void)? = nil) {
+        let logger = NotificationLogger.shared
+        logger.log(.venue, """
+            ==========================================
+            🔍 Starting Nearby Places Check
+            ==========================================
+            """)
+        
         let locationToUse = location ?? locationManager.location
         
         guard let currentLocation = locationToUse else {
+            logger.log(.error, "❌ No location available for nearby places check")
             completion?(.noData)
             return
         }
         
-        // First, check if the current location is within any ignored location's radius
+        logger.log(.location, """
+            📍 Current Location:
+            - Latitude: \(currentLocation.coordinate.latitude)
+            - Longitude: \(currentLocation.coordinate.longitude)
+            - Accuracy: \(currentLocation.horizontalAccuracy)m
+            - Time: \(currentLocation.timestamp)
+            """)
+        
+        // Check if the current location is within any ignored location's radius
+        logger.log(.venue, "Checking \(ignoredLocations.count) ignored locations...")
+        
         for ignoredLocation in ignoredLocations {
             let ignoredCoordinate = ignoredLocation.coordinate
-            let ignoredLocation = CLLocation(latitude: ignoredCoordinate.latitude, longitude: ignoredCoordinate.longitude)
-            if currentLocation.distance(from: ignoredLocation) <= ignoreRadius {
-                // User is within an ignored location, don't proceed
+            let ignoredLocationObj = CLLocation(latitude: ignoredCoordinate.latitude, longitude: ignoredCoordinate.longitude)
+            let distance = currentLocation.distance(from: ignoredLocationObj)
+            
+            logger.log(.venue, """
+                📍 Ignored Location Check:
+                - Name: \(ignoredLocation.name)
+                - Distance: \(Int(distance))m (Threshold: \(Int(ignoreRadius))m)
+                """)
+            
+            if distance <= ignoreRadius {
+                logger.log(.venue, "⛔️ Within ignored location radius, aborting venue check")
                 completion?(.noData)
                 return
             }
         }
         
         let placeTypes = ["restaurant", "cafe", "bar"]
+        logger.log(.venue, "Looking for place types: \(placeTypes.joined(separator: ", "))")
+        
+        // Set up the location bounds for the search
+        let searchBounds = GMSPlaceRectangularLocationOption(
+            CLLocationCoordinate2D(
+                latitude: currentLocation.coordinate.latitude - 0.001,
+                longitude: currentLocation.coordinate.longitude - 0.001
+            ),
+            CLLocationCoordinate2D(
+                latitude: currentLocation.coordinate.latitude + 0.001,
+                longitude: currentLocation.coordinate.longitude + 0.001
+            )
+        )
+        
+        logger.log(.venue, """
+            🔍 Search Parameters:
+            - Search radius: ~100m (0.001 degree latitude/longitude)
+            - Looking for establishments
+            """)
         
         let filter = GMSAutocompleteFilter()
         filter.type = .establishment
-        filter.locationRestriction = GMSPlaceRectangularLocationOption(
-            CLLocationCoordinate2D(latitude: currentLocation.coordinate.latitude - 0.001, longitude: currentLocation.coordinate.longitude - 0.001),
-            CLLocationCoordinate2D(latitude: currentLocation.coordinate.latitude + 0.001, longitude: currentLocation.coordinate.longitude + 0.001)
-        )
+        filter.locationRestriction = searchBounds
         
-        print("Making request to Google Places API: findPlaceLikelihoodsFromCurrentLocation")
+        logger.log(.venue, "Making request to Google Places API...")
         
         placesClient.findPlaceLikelihoodsFromCurrentLocation(withPlaceFields: [.name, .placeID, .types]) { [weak self] (placeLikelihoods, error) in
             guard let self = self else {
+                logger.log(.error, "❌ Self reference lost during Places API callback")
                 completion?(.failed)
                 return
             }
             
             if let error = error {
-                print("Error finding nearby places: \(error.localizedDescription)")
+                logger.log(.error, """
+                    ❌ Google Places API Error:
+                    - Error: \(error.localizedDescription)
+                    - Domain: \(error.localizedDescription)
+                    """)
                 completion?(.failed)
                 return
             }
             
-            if let placeLikelihood = placeLikelihoods?.first,
-               let placeType = placeLikelihood.place.types?.first,
-               placeTypes.contains(placeType) {
-                self.handleDetectedPlace(placeLikelihood.place)
-                completion?(.newData)
+            // Log all found places
+            if let places = placeLikelihoods {
+                logger.log(.venue, """
+                    📍 Places Found: \(places.count)
+                    ==========================================
+                    """)
+                
+                places.forEach { likelihood in
+                    logger.log(.venue, """
+                        Place Details:
+                        - Name: \(likelihood.place.name ?? "Unknown")
+                        - ID: \(likelihood.place.placeID ?? "Unknown")
+                        - Types: \(likelihood.place.types?.joined(separator: ", ") ?? "None")
+                        - Likelihood: \(likelihood.likelihood)
+                        ------------------------------------------
+                        """)
+                }
             } else {
+                logger.log(.venue, "No places found in the vicinity")
+            }
+            
+            // Find the first matching place
+            if let placeLikelihood = placeLikelihoods?.first,
+               let place = placeLikelihoods?.first?.place,
+               let placeType = place.types?.first,
+               placeTypes.contains(placeType) {
+                
+                logger.log(.venue, """
+                    ✅ Found Matching Place:
+                    - Name: \(place.name ?? "Unknown")
+                    - Type: \(placeType)
+                    - Likelihood: \(placeLikelihood.likelihood)
+                    Processing venue...
+                    """)
+                
+                self.handleDetectedPlace(place)
+                completion?(.newData)
+                
+            } else {
+                logger.log(.venue, """
+                    ℹ️ No Matching Places:
+                    - Either no places found
+                    - Or no places match required types: \(placeTypes.joined(separator: ", "))
+                    """)
                 completion?(.noData)
             }
+            
+            logger.log(.venue, """
+                ==========================================
+                🏁 Nearby Places Check Complete
+                ==========================================
+                """)
         }
     }
     
     private func handleDetectedPlace(_ place: GMSPlace) {
-        guard let placeId = place.placeID else { return }
-        
-        // Increment visit count for this venue
-        frequentlyVisitedVenues[placeId, default: 0] += 1
-        print("frequentlyVisitedVenues:", frequentlyVisitedVenues)
-        
-        // Check if this is a frequently visited venue
-        if frequentlyVisitedVenues[placeId, default: 0] >= frequentVisitThreshold {
-            // Don't send notification for frequently visited venues
+        let logger = NotificationLogger.shared
+        guard let placeId = place.placeID else {
+            logger.log(.error, "No place ID available, aborting place detection")
             return
         }
         
-        print("NotifiedVenues:", notifiedVenues)
+        logger.log(.venue, """
+            ==========================================
+            🏢 Processing Detected Place:
+            Name: \(place.name ?? "Unknown")
+            ID: \(placeId)
+            Types: \(place.types?.joined(separator: ", ") ?? "Unknown")
+            ==========================================
+            """)
+        
+        // Increment and log visit count
+        frequentlyVisitedVenues[placeId, default: 0] += 1
+        let visitCount = frequentlyVisitedVenues[placeId, default: 0]
+        logger.log(.venue, "Visit count for this venue: \(visitCount)/\(frequentVisitThreshold) threshold")
+        
+        // Check if this is a frequently visited venue
+        if visitCount >= frequentVisitThreshold {
+            logger.log(.notification, "⛔️ Notification blocked: Frequent visitor threshold reached (\(visitCount) visits)")
+            return
+        }
+        
+        // Log current notification state
+        logger.log(.notification, """
+            Current Notification State:
+            - Total notifications today: \(notifiedVenues.count)/\(maxDailyNotifications)
+            - Notified venues: \(notifiedVenues.keys.joined(separator: ", "))
+            """)
         
         // Check if we've already notified about this venue recently
-        if let lastNotificationDate = notifiedVenues[placeId],
-           Date().timeIntervalSince(lastNotificationDate) < venueCooldown {
-            return
+        if let lastNotificationDate = notifiedVenues[placeId] {
+            let timeSince = Date().timeIntervalSince(lastNotificationDate)
+            let timeRemaining = venueCooldown - timeSince
+            logger.log(.notification, """
+                ⏰ Venue Cooldown Check:
+                - Last notification: \(lastNotificationDate)
+                - Time since last: \(Int(timeSince))s
+                - Cooldown period: \(Int(venueCooldown))s
+                - Time remaining: \(Int(timeRemaining))s
+                """)
+            
+            if timeSince < venueCooldown {
+                logger.log(.notification, "⛔️ Notification blocked: Venue still in cooldown period")
+                return
+            }
         }
         
         // Check if we've reached the daily notification limit
         if notifiedVenues.count >= maxDailyNotifications {
-            print("Daily notification limit reached")
+            logger.log(.notification, "⛔️ Notification blocked: Daily limit reached (\(maxDailyNotifications) notifications)")
             return
         }
         
-        // This is a new venue or we haven't notified about it recently
+        // Check if enough time has passed since the last notification (any venue)
+        if let lastTime = lastNotificationTime {
+            let timeSince = Date().timeIntervalSince(lastTime)
+            let timeRemaining = notificationCooldown - timeSince
+            logger.log(.notification, """
+                ⏰ Global Cooldown Check:
+                - Last notification: \(lastTime)
+                - Time since last: \(Int(timeSince))s
+                - Cooldown period: \(Int(notificationCooldown))s
+                - Time remaining: \(Int(timeRemaining))s
+                """)
+            
+            if timeSince < notificationCooldown {
+                logger.log(.notification, "⛔️ Notification blocked: Global cooldown still active")
+                return
+            }
+        }
+        
+        // All checks passed, proceed with notification
+        logger.log(.notification, """
+            ✅ All checks passed for venue:
+            - Not a frequent venue (\(visitCount) visits)
+            - Not in venue cooldown
+            - Not in global cooldown
+            - Daily limit not reached (\(notifiedVenues.count)/\(maxDailyNotifications))
+            Proceeding with notification...
+            """)
+        
+        // Send the notification
         sendNotification(for: place)
         
+        // Persist the updated data
         persistData()
+        
+        logger.log(.venue, """
+            ==========================================
+            ✅ Place Processing Complete
+            ==========================================
+            """)
     }
     
     private func sendNotification(for place: GMSPlace) {
