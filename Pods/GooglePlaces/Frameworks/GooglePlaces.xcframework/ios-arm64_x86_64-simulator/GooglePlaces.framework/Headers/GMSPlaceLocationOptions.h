@@ -33,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * \defgroup PlaceRectangularLocationOption GMSPlaceRectangularLocationOption
+ * @{
+ */
+
+/**
  * Returns a rectangular location to filter place results inside the boundaries.
  * Supports filtering as a restriction where results must be inside the bounds, or as a bias where
  * results in the bounds are preferred.
@@ -43,6 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXTERN id<GMSPlaceLocationBias, GMSPlaceLocationRestriction>
 GMSPlaceRectangularLocationOption(CLLocationCoordinate2D northEastBounds,
                                   CLLocationCoordinate2D southWestBounds);
+/**@}*/
+
+/**
+ * \defgroup PlaceCircularLocationOption GMSPlaceCircularLocationOption
+ * @{
+ */
 
 /**
  * Returns a circular location to bias place results.
@@ -53,5 +64,6 @@ GMSPlaceRectangularLocationOption(CLLocationCoordinate2D northEastBounds,
  */
 FOUNDATION_EXTERN id<GMSPlaceLocationBias, GMSPlaceLocationRestriction>
 GMSPlaceCircularLocationOption(CLLocationCoordinate2D center, CLLocationDistance radius);
+/**@}*/
 
 NS_ASSUME_NONNULL_END

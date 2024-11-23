@@ -20,7 +20,7 @@
  * The properties represent individual information that can be requested for a |GMSPlace| object.
  * If no request properties are set, the |GMSPlace| object will be empty with no useful information.
  *
- * Note: GMSPlacePropertyPhoneNumber, GMSPlacePropertyNameWebsite and
+ * Note: GMSPlacePropertyPhoneNumber, GMSPlacePropertyWebsite and
  * GMSPlacePropertyAddressComponents are not supported for |GMSPlaceLikelihoodList| place objects.
  * Please refer to https://developers.google.com/places/ios-sdk/place-data-fields for more details.
  */
@@ -67,5 +67,6 @@ FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertyWheelchairAccessibleEntrance;
 FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertyCurrentOpeningHours;
 FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertySecondaryOpeningHours;
 FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertyEditorialSummary;
+FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertyReviews;
 FOUNDATION_EXTERN GMSPlaceProperty GMSPlacePropertyAll;
 

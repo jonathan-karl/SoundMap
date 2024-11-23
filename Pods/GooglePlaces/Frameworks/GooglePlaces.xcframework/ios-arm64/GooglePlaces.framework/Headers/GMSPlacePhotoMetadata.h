@@ -29,6 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, readonly, copy, nullable) NSAttributedString *attributions;
 
+/** The author attributions that must be shown to the user if this photo is displayed. */
+@property(nonatomic, readonly, copy, nullable)
+    NSArray<GMSPlaceAuthorAttribution *> *authorAttributions;
+
 /** The maximum pixel size in which this photo is available. */
 @property(nonatomic, readonly, assign) CGSize maxSize;
 

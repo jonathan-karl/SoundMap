@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		923C99787B0D824EB9ED328E /* Pods_SoundMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 555B85D280A444B6D48FB553 /* Pods_SoundMap.framework */; };
+		1E4F14B0673B253F049EB79F /* Pods_SoundMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71C479ECAF4BCABFC4A2D80F /* Pods_SoundMap.framework */; };
 		AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */; };
 		AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */; };
 		AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */; };
 		AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */; };
+		AB2BAB642CF27DEE00D1B60D /* CustomClusterAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */; };
 		AB2EE0B82C8114F40060121C /* MapStyle.json in Resources */ = {isa = PBXBuildFile; fileRef = AB2EE0B72C8114F40060121C /* MapStyle.json */; };
 		AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */; };
 		AB762B822B7C92060078F237 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB762B812B7C92060078F237 /* GoogleService-Info.plist */; };
@@ -28,17 +29,17 @@
 		ABE28FC02C8A2CB300B09220 /* UserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */; };
 		ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */; };
 		ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */; };
+		ABFF67392CF0C48900728E9E /* NotificationLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABFF67382CF0C48900728E9E /* NotificationLogger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		084875DF401C6FE652EB8877 /* Pods-SoundMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.release.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.release.xcconfig"; sourceTree = "<group>"; };
-		1906B586C9DE7C02425F9B49 /* Pods-Noise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Noise.debug.xcconfig"; path = "Target Support Files/Pods-Noise/Pods-Noise.debug.xcconfig"; sourceTree = "<group>"; };
-		555B85D280A444B6D48FB553 /* Pods_SoundMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SoundMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		601B399B44956CBBFA78DD50 /* Pods-SoundMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.debug.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.debug.xcconfig"; sourceTree = "<group>"; };
+		6386734B163868609BFBC01C /* Pods-SoundMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.release.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.release.xcconfig"; sourceTree = "<group>"; };
+		71C479ECAF4BCABFC4A2D80F /* Pods_SoundMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SoundMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadViewController.swift; sourceTree = "<group>"; };
 		AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InfoWindowView.swift; path = /Users/jonathan/Downloads/Noise/SoundMap/Controller/InfoWindowView.swift; sourceTree = "<absolute>"; };
 		AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomeClusterRenderer.swift; sourceTree = "<group>"; };
 		AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLaunchScreen.swift; sourceTree = "<group>"; };
+		AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomClusterAlgorithm.swift; sourceTree = "<group>"; };
 		AB2EE0B72C8114F40060121C /* MapStyle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MapStyle.json; sourceTree = "<group>"; };
 		AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Noise Logo - buffer.jpeg"; path = "SoundMap/Assets.xcassets/AppIcon.appiconset/Noise Logo - buffer.jpeg"; sourceTree = SOURCE_ROOT; };
 		AB762B812B7C92060078F237 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -58,7 +59,8 @@
 		ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTabViewController.swift; sourceTree = "<group>"; };
 		ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoredLocationsView.swift; sourceTree = "<group>"; };
 		ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationNotificationManager.swift; sourceTree = "<group>"; };
-		D2B8851B115249E51612B43F /* Pods-Noise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Noise.release.xcconfig"; path = "Target Support Files/Pods-Noise/Pods-Noise.release.xcconfig"; sourceTree = "<group>"; };
+		ABFF67382CF0C48900728E9E /* NotificationLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationLogger.swift; sourceTree = "<group>"; };
+		EB0ED8BC23F95C7CE8135584 /* Pods-SoundMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.debug.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,18 +68,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				923C99787B0D824EB9ED328E /* Pods_SoundMap.framework in Frameworks */,
+				1E4F14B0673B253F049EB79F /* Pods_SoundMap.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D0D8117F25853859161FFB8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				71C479ECAF4BCABFC4A2D80F /* Pods_SoundMap.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AB32861C2B79587C005D50FC /* Controller */ = {
 			isa = PBXGroup;
 			children = (
 				AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */,
 				AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */,
+				AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */,
 				AB8D8E252B7950D30074520B /* MapsViewController.swift */,
 				AB8D8E372B7952EC0074520B /* RecordViewController.swift */,
 				ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */,
@@ -87,6 +98,7 @@
 				ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */,
 				ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */,
 				ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */,
+				ABFF67382CF0C48900728E9E /* NotificationLogger.swift */,
 				ABE28FC52C8B92AA00B09220 /* IgnoredLocationsView.swift */,
 			);
 			path = Controller;
@@ -98,7 +110,7 @@
 				AB8D8E202B7950D30074520B /* SoundMap */,
 				AB8D8E1F2B7950D30074520B /* Products */,
 				BDE55348615DAA1BECAEC37B /* Pods */,
-				E07FE803954C0D978F9FA8D7 /* Frameworks */,
+				4D0D8117F25853859161FFB8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -131,20 +143,10 @@
 		BDE55348615DAA1BECAEC37B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1906B586C9DE7C02425F9B49 /* Pods-Noise.debug.xcconfig */,
-				D2B8851B115249E51612B43F /* Pods-Noise.release.xcconfig */,
-				601B399B44956CBBFA78DD50 /* Pods-SoundMap.debug.xcconfig */,
-				084875DF401C6FE652EB8877 /* Pods-SoundMap.release.xcconfig */,
+				EB0ED8BC23F95C7CE8135584 /* Pods-SoundMap.debug.xcconfig */,
+				6386734B163868609BFBC01C /* Pods-SoundMap.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		E07FE803954C0D978F9FA8D7 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				555B85D280A444B6D48FB553 /* Pods_SoundMap.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,12 +156,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB8D8E322B7950D40074520B /* Build configuration list for PBXNativeTarget "SoundMap" */;
 			buildPhases = (
-				C5CC422714EF54F20B103F90 /* [CP] Check Pods Manifest.lock */,
+				BAD85218E264A294422C9608 /* [CP] Check Pods Manifest.lock */,
 				AB8D8E1A2B7950D30074520B /* Sources */,
 				AB8D8E1B2B7950D30074520B /* Frameworks */,
 				AB8D8E1C2B7950D30074520B /* Resources */,
-				287A419EB5358339BA6C24F2 /* [CP] Copy Pods Resources */,
-				428E83ADB23519611F56EE85 /* [CP] Embed Pods Frameworks */,
+				12957E7EF20DC96E6EDFDB3E /* [CP] Embed Pods Frameworks */,
+				4A9BC4C270DD8994A7D5575E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -219,24 +221,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		287A419EB5358339BA6C24F2 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		428E83ADB23519611F56EE85 /* [CP] Embed Pods Frameworks */ = {
+		12957E7EF20DC96E6EDFDB3E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,7 +238,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C5CC422714EF54F20B103F90 /* [CP] Check Pods Manifest.lock */ = {
+		4A9BC4C270DD8994A7D5575E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BAD85218E264A294422C9608 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -285,6 +287,7 @@
 				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
 				ABE28FBE2C8A2C6C00B09220 /* UserTabView.swift in Sources */,
 				ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */,
+				AB2BAB642CF27DEE00D1B60D /* CustomClusterAlgorithm.swift in Sources */,
 				ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */,
 				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
 				AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */,
@@ -292,6 +295,7 @@
 				AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */,
 				AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */,
 				AB8D8E222B7950D30074520B /* AppDelegate.swift in Sources */,
+				ABFF67392CF0C48900728E9E /* NotificationLogger.swift in Sources */,
 				AB8D8E242B7950D30074520B /* SceneDelegate.swift in Sources */,
 				ABE28FC02C8A2CB300B09220 /* UserTabViewController.swift in Sources */,
 				AB9831712B7F8738009DAEC3 /* MoreInfoViewController.swift in Sources */,
@@ -435,10 +439,11 @@
 		};
 		AB8D8E332B7950D40074520B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 601B399B44956CBBFA78DD50 /* Pods-SoundMap.debug.xcconfig */;
+			baseConfigurationReference = EB0ED8BC23F95C7CE8135584 /* Pods-SoundMap.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SoundMap/SoundMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -476,10 +481,11 @@
 		};
 		AB8D8E342B7950D40074520B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 084875DF401C6FE652EB8877 /* Pods-SoundMap.release.xcconfig */;
+			baseConfigurationReference = 6386734B163868609BFBC01C /* Pods-SoundMap.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = SoundMap/SoundMap.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;

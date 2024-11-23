@@ -15,6 +15,11 @@
 #import "GMSPlaceLocationOptions.h"
 #import "GMSPlaceProperty.h"
 
+/**
+ * \defgroup PlaceSearchByTextRankPreference GMSPlaceSearchByTextRankPreference
+ * @{
+ */
+
 /** How results will be ranked in the response. */
 typedef NS_ENUM(NSInteger, GMSPlaceSearchByTextRankPreference) {
   GMSPlaceSearchByTextRankPreferenceDistance,
@@ -25,6 +30,8 @@ typedef NS_ENUM(NSInteger, GMSPlaceSearchByTextRankPreference) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** Represents a text search request definition to be sent via |GMSPlacesClient|. */
+
 @interface GMSPlaceSearchByTextRequest : NSObject
 
 /**
@@ -32,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param textQuery The string query for the search request.
  * @param placeProperties The array of |GMSPlaceProperty| that should be included in place results.
+ * Must not be empty. An empty list will result in an error when trying to send the request.
  */
 - (instancetype)initWithTextQuery:(NSString *)textQuery
                   placeProperties:(NSArray<GMSPlaceProperty> *)placeProperties

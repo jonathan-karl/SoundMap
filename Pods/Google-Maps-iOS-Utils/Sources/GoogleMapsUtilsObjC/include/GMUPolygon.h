@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 Google Inc.
+/* Copyright (c) 2016 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,31 @@
  * limitations under the License.
  */
 
-#import "GQTPointQuadTreeItem.h"
-
 #import <CoreLocation/CoreLocation.h>
+#import <Foundation/Foundation.h>
+
+#import "GMUGeometry.h"
+@import GoogleMaps;
 
 NS_ASSUME_NONNULL_BEGIN
 
-// A quad tree item which represents a data point of given intensity at a given point on the earth's
-// surface.
-@interface GMUWeightedLatLng : NSObject <GQTPointQuadTreeItem>
+/**
+ * Instances of this class represent a Polygon object.
+ */
+@interface GMUPolygon : NSObject<GMUGeometry>
 
-// The intensity of the data point.  Scale is arbitrary but assumed to be linear. Intensity three
-// should be equivalent to three co-located points of intensity one.
-@property(nonatomic, readonly) float intensity;
+/**
+ * The array of LinearRing paths for the Polygon. The first is the exterior ring of the Polygon; any
+ * subsequent rings are holes.
+ */
+@property(nonatomic, readonly) NSArray<GMSPath *> *paths;
 
-// Designated initializer.
-- (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate intensity:(float)intensity;
+/**
+ * Initializes a GMUGeoJSONPolygon object with a set of paths.
+ *
+ * @param paths The paths of the Polygon.
+ */
+- (instancetype)initWithPaths:(NSArray<GMSPath *> *)paths;
 
 @end
 

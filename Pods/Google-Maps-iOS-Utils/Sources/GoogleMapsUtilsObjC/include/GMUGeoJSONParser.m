@@ -17,8 +17,6 @@
 
 #import <CoreLocation/CoreLocation.h>
 
-#import <GoogleMaps/GoogleMaps.h>
-
 #import "GMUFeature.h"
 #import "GMUGeometryCollection.h"
 #import "GMULineString.h"
@@ -170,6 +168,9 @@ static NSString *const kGMUGeometryRegex =
   NSDictionary *properties = [feature objectForKey:kGMUPropertiesMember];
   if ([feature objectForKey:kGMUGeometryMember]) {
     geometry = [self geometryFromDict:[feature objectForKey:kGMUGeometryMember]];
+  }
+  if (geometry == nil) {
+    return nil;
   }
   if (_boundingBox) {
     boundingBox = _boundingBox;

@@ -90,9 +90,9 @@ typedef NS_ENUM(NSInteger, GMSPlacesBusinessStatus) {
 typedef NS_ENUM(NSInteger, GMSBooleanPlaceAttribute) {
   /** The place's attribute has not been requested yet, or not known. */
   GMSBooleanPlaceAttributeUnknown,
-  /** The place’s attribute is available. */
+  /** The place’s attribute is True. */
   GMSBooleanPlaceAttributeTrue,
-  /** The place’s attribute is not available. */
+  /** The place’s attribute is False. */
   GMSBooleanPlaceAttributeFalse,
 };
 
@@ -134,6 +134,9 @@ typedef NS_ENUM(NSInteger, GMSBooleanPlaceAttribute) {
  * enough users have reviewed this place).
  */
 @property(nonatomic, readonly, assign) float rating;
+
+/** An array of |GMSPlaceReview| objects representing the user reviews of the place. */
+@property(nonatomic, copy, readonly, nullable) NSArray<GMSPlaceReview *> *reviews;
 
 
 /**
@@ -246,7 +249,6 @@ typedef NS_ENUM(NSInteger, GMSBooleanPlaceAttribute) {
     __GMS_AVAILABLE_BUT_DEPRECATED_MSG("(This method is deprecated in favor of "
                                        "<code>GMSPlacesClient#isOpenAtDate:place:date:callback</"
                                        "code> and will be removed in a future release.");
-;
 
 /**
  * Calculates if a place is open based on |openingHours|, |UTCOffsetMinutes|, and current date
@@ -258,7 +260,6 @@ typedef NS_ENUM(NSInteger, GMSBooleanPlaceAttribute) {
 - (GMSPlaceOpenStatus)isOpen __GMS_AVAILABLE_BUT_DEPRECATED_MSG(
     "(This method is deprecated in favor of <code>GMSPlacesClient#isOpen:place:callback</code> and "
     "will be removed in a future release.");
-;
 
 /** Background color of the icon according to Place type, to color the view behind the icon. */
 @property(nonatomic, readonly, nullable) UIColor *iconBackgroundColor;
