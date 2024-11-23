@@ -672,7 +672,6 @@ extension MapsViewController: UIGestureRecognizerDelegate {
     }
 }
 
-
 class MarkerData {
     var placeName: String
     var placeAddress: String
@@ -700,5 +699,38 @@ class PaddingLabel: UILabel {
     override func drawText(in rect: CGRect) {
         let insets = UIEdgeInsets(top: 2, left: 5, bottom: 2, right: 5)
         super.drawText(in: rect.inset(by: insets))
+    }
+}
+
+// MARK: - Map Performance Optimization
+private extension MapsViewController {
+    func configureMapPerformance() {
+        // Configure map view settings for better performance
+        mapView.settings.tiltGestures = false  // Disable tilt to improve performance
+        mapView.settings.rotateGestures = false  // Disable rotation if not needed
+        mapView.settings.consumesGesturesInView = true
+        
+        // Implement memory management
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMemoryWarning),
+            name: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil
+        )
+    }
+
+    @objc func handleMemoryWarning() {
+        // Clear cached marker images
+        markers.forEach { marker in
+            if marker.icon != nil {
+                marker.icon = nil
+            }
+        }
+        
+        // Force garbage collection of marker data
+        autoreleasepool {
+            // Keep the markers array but clear any cached data
+            visibleLabels.removeAll(keepingCapacity: true)
+        }
     }
 }
