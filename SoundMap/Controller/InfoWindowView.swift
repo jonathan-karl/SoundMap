@@ -11,6 +11,8 @@ import SafariServices
 class CustomInfoWindow: UIView {
     private let titleLabel = UILabel()
     private let decibelLabel = UILabel()
+    private let decibelDescriptionLabel = UILabel() // New label for noise level description
+    private let decibelStack = UIStackView() // Stack view to hold decibel label and description
     private let conversationView = UIView()
     private let conversationIcon = UIImageView()
     private let conversationLabel = UILabel()
@@ -44,17 +46,21 @@ class CustomInfoWindow: UIView {
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 10
         
-        [titleLabel, decibelLabel, conversationView, topNoisesView, buttonStackView].forEach {
+        // Set up decibel stack view
+        decibelStack.axis = .vertical
+        decibelStack.alignment = .trailing
+        decibelStack.spacing = 2
+        decibelStack.addArrangedSubview(decibelLabel)
+        decibelStack.addArrangedSubview(decibelDescriptionLabel)
+        
+        // Change this line to use decibelStack instead of decibelLabel
+        [titleLabel, decibelStack, conversationView, topNoisesView, buttonStackView].forEach {
             addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        titleLabel.textColor = .label
-        decibelLabel.textColor = .label
-        titleLabel.font = UIFont.systemFont(ofSize: 22, weight: .bold)
-        decibelLabel.font = UIFont.systemFont(ofSize: 28, weight: .bold)
-        decibelLabel.textAlignment = .right
-        
+        setupTitleLabel()
+        setupDecibelLabels()
         setupConversationView()
         setupTopNoisesView()
         setupButtons()
@@ -62,8 +68,30 @@ class CustomInfoWindow: UIView {
         setupConstraints()
     }
     
+    private func setupTitleLabel() {
+        titleLabel.textColor = .label
+        titleLabel.numberOfLines = 2
+        titleLabel.adjustsFontSizeToFitWidth = true
+        titleLabel.minimumScaleFactor = 0.7
+        titleLabel.font = .systemFont(ofSize: 20, weight: .bold) // Slightly smaller initial font
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    }
+    
+    private func setupDecibelLabels() {
+        // Setup main decibel label
+        decibelLabel.textColor = .label
+        decibelLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        decibelLabel.textAlignment = .right
+        decibelLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        decibelLabel.setContentHuggingPriority(.required, for: .horizontal)
+        
+        // Setup description label
+        decibelDescriptionLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        decibelDescriptionLabel.textAlignment = .right
+    }
+    
     private func setupConversationView() {
-        conversationView.layer.cornerRadius = 12
+        conversationView.layer.cornerRadius = 10 // Slightly smaller corner radius
         
         [conversationIcon, conversationLabel].forEach {
             conversationView.addSubview($0)
@@ -73,12 +101,12 @@ class CustomInfoWindow: UIView {
         conversationIcon.image = UIImage(systemName: "bubble.left.fill")
         conversationIcon.tintColor = .label
         conversationLabel.textColor = .label
-        conversationLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        conversationLabel.font = .systemFont(ofSize: 15, weight: .medium) // Slightly smaller
     }
     
     private func setupTopNoisesView() {
         topNoisesView.backgroundColor = .secondarySystemBackground
-        topNoisesView.layer.cornerRadius = 12
+        topNoisesView.layer.cornerRadius = 10
         
         [topNoisesIcon, topNoisesLabel, topNoisesList].forEach {
             topNoisesView.addSubview($0)
@@ -86,26 +114,26 @@ class CustomInfoWindow: UIView {
         }
         
         topNoisesIcon.image = UIImage(systemName: "speaker.wave.3.fill")
-        topNoisesIcon.tintColor = .darkGray // Darker icon color
-        
-        topNoisesLabel.text = "Top Noises"
-        topNoisesLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         topNoisesIcon.tintColor = .secondaryLabel
+        
+        topNoisesLabel.text = "How often are noises reported?"
+        topNoisesLabel.font = .systemFont(ofSize: 15, weight: .medium)
         topNoisesLabel.textColor = .secondaryLabel
         
         topNoisesList.axis = .vertical
-        topNoisesList.spacing = 4
+        topNoisesList.spacing = 3 // Reduced spacing between noise items
+        topNoisesList.alignment = .leading // Align items to the left
     }
     
     private func setupButtons() {
         buttonStackView.axis = .horizontal
         buttonStackView.distribution = .fillEqually
-        buttonStackView.spacing = 10
+        buttonStackView.spacing = 8 // Slightly reduced spacing
         
         [googleMapsButton, shareButton].forEach {
             buttonStackView.addArrangedSubview($0)
-            $0.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-            $0.layer.cornerRadius = 12
+            $0.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+            $0.layer.cornerRadius = 10
             $0.backgroundColor = .systemBlue.withAlphaComponent(0.1)
             $0.setTitleColor(.systemBlue, for: .normal)
         }
@@ -121,49 +149,89 @@ class CustomInfoWindow: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            // Title and decibel stack constraints
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: decibelLabel.leadingAnchor, constant: -8),
+            titleLabel.trailingAnchor.constraint(equalTo: decibelStack.leadingAnchor, constant: -12),
             
-            decibelLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-            decibelLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            decibelStack.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            decibelStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            decibelStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 70),
             
-            conversationView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            // Conversation view with reduced spacing
+            conversationView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
             conversationView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             conversationView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            conversationView.heightAnchor.constraint(equalToConstant: 50),
+            conversationView.heightAnchor.constraint(equalToConstant: 44), // Slightly reduced height
             
-            conversationIcon.leadingAnchor.constraint(equalTo: conversationView.leadingAnchor, constant: 12),
+            conversationIcon.leadingAnchor.constraint(equalTo: conversationView.leadingAnchor, constant: 10),
             conversationIcon.centerYAnchor.constraint(equalTo: conversationView.centerYAnchor),
-            conversationIcon.widthAnchor.constraint(equalToConstant: 24),
-            conversationIcon.heightAnchor.constraint(equalToConstant: 24),
+            conversationIcon.widthAnchor.constraint(equalToConstant: 20),
+            conversationIcon.heightAnchor.constraint(equalToConstant: 20),
             
             conversationLabel.leadingAnchor.constraint(equalTo: conversationIcon.trailingAnchor, constant: 8),
             conversationLabel.centerYAnchor.constraint(equalTo: conversationView.centerYAnchor),
             
+            // Top noises view with optimized spacing
             topNoisesView.topAnchor.constraint(equalTo: conversationView.bottomAnchor, constant: 12),
             topNoisesView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             topNoisesView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             
-            topNoisesIcon.topAnchor.constraint(equalTo: topNoisesView.topAnchor, constant: 12),
-            topNoisesIcon.leadingAnchor.constraint(equalTo: topNoisesView.leadingAnchor, constant: 12),
-            topNoisesIcon.widthAnchor.constraint(equalToConstant: 24),
-            topNoisesIcon.heightAnchor.constraint(equalToConstant: 24),
+            topNoisesIcon.topAnchor.constraint(equalTo: topNoisesView.topAnchor, constant: 10),
+            topNoisesIcon.leadingAnchor.constraint(equalTo: topNoisesView.leadingAnchor, constant: 10),
+            topNoisesIcon.widthAnchor.constraint(equalToConstant: 20),
+            topNoisesIcon.heightAnchor.constraint(equalToConstant: 20),
             
             topNoisesLabel.centerYAnchor.constraint(equalTo: topNoisesIcon.centerYAnchor),
             topNoisesLabel.leadingAnchor.constraint(equalTo: topNoisesIcon.trailingAnchor, constant: 8),
             
             topNoisesList.topAnchor.constraint(equalTo: topNoisesIcon.bottomAnchor, constant: 8),
-            topNoisesList.leadingAnchor.constraint(equalTo: topNoisesView.leadingAnchor, constant: 12),
-            topNoisesList.trailingAnchor.constraint(equalTo: topNoisesView.trailingAnchor, constant: -12),
-            topNoisesList.bottomAnchor.constraint(equalTo: topNoisesView.bottomAnchor, constant: -12),
+            topNoisesList.leadingAnchor.constraint(equalTo: topNoisesView.leadingAnchor, constant: 10),
+            topNoisesList.trailingAnchor.constraint(equalTo: topNoisesView.trailingAnchor, constant: -10),
+            topNoisesList.bottomAnchor.constraint(equalTo: topNoisesView.bottomAnchor, constant: -10),
             
-            buttonStackView.topAnchor.constraint(equalTo: topNoisesView.bottomAnchor, constant: 16),
+            // Button stack view with reduced spacing
+            buttonStackView.topAnchor.constraint(equalTo: topNoisesView.bottomAnchor, constant: 12),
             buttonStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             buttonStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             buttonStackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16),
-            buttonStackView.heightAnchor.constraint(equalToConstant: 50)
+            buttonStackView.heightAnchor.constraint(equalToConstant: 44) // Slightly reduced height
         ])
+    }
+    
+    func configure(with data: VenueNoiseData) {
+        titleLabel.text = data.venueName
+        decibelLabel.text = "\(data.noiseLevel) dB"
+        
+        let noiseLevel = Double(data.noiseLevel)
+        let color = getColorForNoiseLevel(noiseLevel)
+        decibelLabel.textColor = color
+        
+        // Configure the description label
+        let description = getNoiseDescription(for: noiseLevel)
+        decibelDescriptionLabel.text = description
+        decibelDescriptionLabel.textColor = color
+        
+        let conversationColor = getColorForConversationDifficulty(data.conversationEase)
+        conversationView.backgroundColor = conversationColor.withAlphaComponent(0.1)
+        conversationIcon.tintColor = conversationColor
+        conversationLabel.textColor = conversationColor
+        conversationLabel.text = "Conversation: \(data.conversationEase)"
+        
+        // Clear existing noise labels
+        topNoisesList.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        // Add noise labels with optimized appearance
+        data.topNoises.prefix(3).forEach { noise, percentage in
+            let noiseLabel = UILabel()
+            noiseLabel.text = "\(noise): \(percentage)%"
+            noiseLabel.font = .systemFont(ofSize: 13)
+            noiseLabel.textColor = .secondaryLabel
+            topNoisesList.addArrangedSubview(noiseLabel)
+        }
+        
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
     @objc private func googleMapsTapped() {
@@ -183,28 +251,17 @@ class CustomInfoWindow: UIView {
         onTap?()
     }
     
-    func configure(with data: VenueNoiseData) {
-        titleLabel.text = data.venueName
-        decibelLabel.text = "\(data.noiseLevel) dB"
-        decibelLabel.textColor = getColorForNoiseLevel(Double(data.noiseLevel))
-        
-        let conversationColor = getColorForConversationDifficulty(data.conversationEase)
-        conversationView.backgroundColor = conversationColor.withAlphaComponent(0.1)
-        conversationIcon.tintColor = conversationColor
-        conversationLabel.textColor = conversationColor
-        conversationLabel.text = "Conversation: \(data.conversationEase)"
-        
-        topNoisesList.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        data.topNoises.forEach { noise, percentage in
-            let noiseLabel = UILabel()
-            noiseLabel.text = "\(noise): \(percentage)%"
-            noiseLabel.font = UIFont.systemFont(ofSize: 14)
-            noiseLabel.textColor = .darkGray
-            topNoisesList.addArrangedSubview(noiseLabel)
+    private func getNoiseDescription(for db: Double) -> String {
+        switch db {
+        case ..<70:
+            return "Silent"
+        case 70..<76:
+            return "Moderate"
+        case 76..<80:
+            return "Loud"
+        default:
+            return "Very Loud"
         }
-        
-        setNeedsLayout()
-        layoutIfNeeded()
     }
     
     private func getColorForNoiseLevel(_ db: Double) -> UIColor {
