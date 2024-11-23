@@ -8,8 +8,8 @@
 import UIKit
 import CoreLocation
 import AVFoundation
-import FirebaseFirestore
 import Firebase
+import FirebaseFirestore
 
 
 class RecordAudioViewController: UIViewController, AVAudioRecorderDelegate {
