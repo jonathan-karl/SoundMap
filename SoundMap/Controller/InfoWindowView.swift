@@ -149,20 +149,21 @@ class CustomInfoWindow: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Title and decibel stack constraints
-            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            // Title and decibel stack - both aligned to top
+            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: decibelStack.leadingAnchor, constant: -12),
             
-            decibelStack.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            decibelStack.topAnchor.constraint(equalTo: topAnchor, constant: 12),
             decibelStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             decibelStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 70),
             
-            // Conversation view with reduced spacing
-            conversationView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
+            // Conversation view anchored to both bottom anchors with greater than or equal
+            conversationView.topAnchor.constraint(greaterThanOrEqualTo: titleLabel.bottomAnchor, constant: 4),
+            conversationView.topAnchor.constraint(greaterThanOrEqualTo: decibelStack.bottomAnchor, constant: 4),
             conversationView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             conversationView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            conversationView.heightAnchor.constraint(equalToConstant: 44), // Slightly reduced height
+            conversationView.heightAnchor.constraint(equalToConstant: 40),
             
             conversationIcon.leadingAnchor.constraint(equalTo: conversationView.leadingAnchor, constant: 10),
             conversationIcon.centerYAnchor.constraint(equalTo: conversationView.centerYAnchor),
