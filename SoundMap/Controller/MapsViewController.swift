@@ -106,9 +106,8 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     
     private func setupClusterManager() {
         print("Setting up ClusterManager")
-        let iconGenerator = GMUDefaultClusterIconGenerator()
         let algorithm = GMUNonHierarchicalDistanceBasedAlgorithm()
-        let renderer = GMUDefaultClusterRenderer(mapView: mapView, clusterIconGenerator: iconGenerator)
+        let renderer = CustomClusterRenderer(mapView: mapView)
         
         clusterManager = GMUClusterManager(map: mapView, algorithm: algorithm, renderer: renderer)
         clusterManager.setDelegate(self, mapDelegate: self)

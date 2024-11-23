@@ -12,7 +12,6 @@
 		AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */; };
 		AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */; };
 		AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */; };
-		AB2BAB642CF27DEE00D1B60D /* CustomClusterAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */; };
 		AB2EE0B82C8114F40060121C /* MapStyle.json in Resources */ = {isa = PBXBuildFile; fileRef = AB2EE0B72C8114F40060121C /* MapStyle.json */; };
 		AB32861B2B795800005D50FC /* Noise Logo - buffer.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */; };
 		AB762B822B7C92060078F237 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB762B812B7C92060078F237 /* GoogleService-Info.plist */; };
@@ -39,7 +38,6 @@
 		AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InfoWindowView.swift; path = /Users/jonathan/Downloads/Noise/SoundMap/Controller/InfoWindowView.swift; sourceTree = "<absolute>"; };
 		AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomeClusterRenderer.swift; sourceTree = "<group>"; };
 		AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLaunchScreen.swift; sourceTree = "<group>"; };
-		AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomClusterAlgorithm.swift; sourceTree = "<group>"; };
 		AB2EE0B72C8114F40060121C /* MapStyle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MapStyle.json; sourceTree = "<group>"; };
 		AB32861A2B795800005D50FC /* Noise Logo - buffer.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "Noise Logo - buffer.jpeg"; path = "SoundMap/Assets.xcassets/AppIcon.appiconset/Noise Logo - buffer.jpeg"; sourceTree = SOURCE_ROOT; };
 		AB762B812B7C92060078F237 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -88,7 +86,6 @@
 			children = (
 				AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */,
 				AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */,
-				AB2BAB632CF27DEE00D1B60D /* CustomClusterAlgorithm.swift */,
 				AB8D8E252B7950D30074520B /* MapsViewController.swift */,
 				AB8D8E372B7952EC0074520B /* RecordViewController.swift */,
 				ABA2BCD82B7A010400257211 /* EstablishmentSelectorViewController.swift */,
@@ -287,7 +284,6 @@
 				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
 				ABE28FBE2C8A2C6C00B09220 /* UserTabView.swift in Sources */,
 				ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */,
-				AB2BAB642CF27DEE00D1B60D /* CustomClusterAlgorithm.swift in Sources */,
 				ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */,
 				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
 				AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */,
