@@ -24,39 +24,70 @@ exports.aggregateUploadsData = functions.firestore
                 // Initialize a new entry for this placeID if it doesn't already exist
                 if (!aggregates[placeID]) {
                     aggregates[placeID] = {
-                        conversationDifficulty: {}, 
+                        conversationDifficulty: {
+                            morning: {},
+                            afternoon: {},
+                            evening: {},
+                            overall: {} // Added overall conversation difficulty
+                        },
                         noiseSources: {},
                         placeTypes: {},
                         placeName: data.placeName || "Unknown Place",
                         placeAddress: data.placeAddress || "Unknown Address",
                         placeLon: data.placeLon || 0,
                         placeLat: data.placeLat || 0,
-                        totalNoiseLevel: 0, 
-                        noiseLevelCount: 0,
+                        noiseLevel: {
+                            morning: { total: 0, count: 0 },
+                            afternoon: { total: 0, count: 0 },
+                            evening: { total: 0, count: 0 },
+                            overall: { total: 0, count: 0 }
+                        },
                         submissionCount: 0,
-                        latestUploadTimestamp: null // Initialize latest upload timestamp
+                        latestUploadTimestamp: null
                     };
                 }
 
                 // Update latest upload timestamp if this upload is newer
-                if (!aggregates[placeID].latestUploadTimestamp || data.uploadTime > aggregates[placeID].latestUploadTimestamp) {
+                if (!aggregates[placeID].latestUploadTimestamp || 
+                    data.uploadTime > aggregates[placeID].latestUploadTimestamp) {
                     aggregates[placeID].latestUploadTimestamp = data.uploadTime;
                 }
 
                 // Increment submission count for this placeID
                 aggregates[placeID].submissionCount++;
 
-                // Aggregate conversationDifficulty as before
+                // Determine time of day based on upload timestamp
+                const uploadTime = data.uploadTime?.toDate() || new Date();
+                const hour = uploadTime.getHours();
+                let timeOfDay;
+
+                if (hour >= 6 && hour < 12) {
+                    timeOfDay = 'morning';
+                } else if (hour >= 12 && hour < 18) {
+                    timeOfDay = 'afternoon';
+                } else {
+                    timeOfDay = 'evening';
+                }
+
+                // Aggregate conversationDifficulty by time of day and overall
                 if (data.hasOwnProperty('conversationDifficulty')) {
                     const difficulty = data.conversationDifficulty;
-                    aggregates[placeID].conversationDifficulty[difficulty] = 
-                        (aggregates[placeID].conversationDifficulty[difficulty] || 0) + 1;
+                    // Time-based aggregation
+                    aggregates[placeID].conversationDifficulty[timeOfDay][difficulty] = 
+                        (aggregates[placeID].conversationDifficulty[timeOfDay][difficulty] || 0) + 1;
+                    // Overall aggregation
+                    aggregates[placeID].conversationDifficulty.overall[difficulty] = 
+                        (aggregates[placeID].conversationDifficulty.overall[difficulty] || 0) + 1;
                 }
                 
-                // Aggregate currentNoiseLevel
+                // Aggregate currentNoiseLevel for both time of day and overall
                 if (data.hasOwnProperty('currentNoiseLevel')) {
-                    aggregates[placeID].totalNoiseLevel += data.currentNoiseLevel;
-                    aggregates[placeID].noiseLevelCount += 1;
+                    // Time-based noise level
+                    aggregates[placeID].noiseLevel[timeOfDay].total += data.currentNoiseLevel;
+                    aggregates[placeID].noiseLevel[timeOfDay].count += 1;
+                    // Overall noise level
+                    aggregates[placeID].noiseLevel.overall.total += data.currentNoiseLevel;
+                    aggregates[placeID].noiseLevel.overall.count += 1;
                 }
 
                 // Aggregate noiseSources
@@ -76,45 +107,82 @@ exports.aggregateUploadsData = functions.firestore
             });
 
             for (const placeID in aggregates) {
-              const {conversationDifficulty, noiseSources, placeTypes, placeName, placeAddress, placeLon, placeLat, totalNoiseLevel, noiseLevelCount, submissionCount, latestUploadTimestamp} = aggregates[placeID];
-              let conversationDifficultyElements = [], conversationDifficultyFrequencies = [];
-              let noiseSourcesElements = [], noiseSourcesFrequencies = [];
-              let averageNoiseLevel = noiseLevelCount > 0 ? totalNoiseLevel / noiseLevelCount : 0;
+                const {
+                    conversationDifficulty,
+                    noiseSources,
+                    placeTypes,
+                    placeName,
+                    placeAddress,
+                    placeLon,
+                    placeLat,
+                    noiseLevel,
+                    submissionCount,
+                    latestUploadTimestamp
+                } = aggregates[placeID];
 
-              // Determine the majority placeType
-              let placeType = "";
-              const placeTypesArray = Object.entries(placeTypes);
-              if (placeTypesArray.length > 0) {
-                  placeTypesArray.sort((a, b) => b[1] - a[1]);  // Sort by frequency descending
-                  const highestFrequency = placeTypesArray[0][1];
-                  
-                  // Filter to get all types with the highest frequency
-                  const topPlaceTypes = placeTypesArray.filter(([type, freq]) => freq === highestFrequency);
-                  
-                  // Randomly pick one if there's a tie
-                  placeType = topPlaceTypes[Math.floor(Math.random() * topPlaceTypes.length)][0];
-              }
-
-                // Generate arrays for conversationDifficulty and noiseSources elements and frequencies
-                if (Object.keys(conversationDifficulty).length > 0) {
-                    const sortedDifficulties = Object.entries(conversationDifficulty).sort((a, b) => b[1] - a[1]);
+                // Process conversation difficulties (overall)
+                let conversationDifficultyElements = [], conversationDifficultyFrequencies = [];
+                if (Object.keys(conversationDifficulty.overall).length > 0) {
+                    const sortedDifficulties = Object.entries(conversationDifficulty.overall)
+                        .sort((a, b) => b[1] - a[1]);
                     sortedDifficulties.forEach(([element, frequency]) => {
                         conversationDifficultyElements.push(element);
                         conversationDifficultyFrequencies.push(frequency);
                     });
                 }
 
+                // Process time-based conversation difficulties
+                const timeBasedDifficulties = {};
+                for (const period of ['morning', 'afternoon', 'evening']) {
+                    const periodData = conversationDifficulty[period];
+                    let maxCount = 0;
+                    let majorityDifficulty = 'Unknown';
+                    
+                    for (const [difficulty, count] of Object.entries(periodData)) {
+                        if (count > maxCount) {
+                            maxCount = count;
+                            majorityDifficulty = difficulty;
+                        }
+                    }
+                    timeBasedDifficulties[period] = majorityDifficulty;
+                }
+
+                // Process time-based noise levels
+                const timeBasedNoiseLevels = {};
+                for (const period of ['morning', 'afternoon', 'evening']) {
+                    const periodData = noiseLevel[period];
+                    timeBasedNoiseLevels[period] = periodData.count > 0 
+                        ? periodData.total / periodData.count 
+                        : 0;
+                }
+
+                // Calculate overall average noise level
+                const averageNoiseLevel = noiseLevel.overall.count > 0 
+                    ? noiseLevel.overall.total / noiseLevel.overall.count 
+                    : 0;
+
+                // Process noise sources
+                let noiseSourcesElements = [], noiseSourcesFrequencies = [];
                 if (Object.keys(noiseSources).length > 0) {
                     const sortedSources = Object.entries(noiseSources).sort((a, b) => b[1] - a[1]);
                     sortedSources.forEach(([element, frequency]) => {
                         noiseSourcesElements.push(element);
-                        // Calculate percentage and round to nearest integer
                         const percentage = Math.round((frequency / submissionCount) * 100);
                         noiseSourcesFrequencies.push(percentage);
                     });
                 }
 
-                // Update or create the document in outputs collection with the additional fields
+                // Determine majority place type
+                let placeType = "";
+                const placeTypesArray = Object.entries(placeTypes);
+                if (placeTypesArray.length > 0) {
+                    placeTypesArray.sort((a, b) => b[1] - a[1]);
+                    const highestFrequency = placeTypesArray[0][1];
+                    const topPlaceTypes = placeTypesArray.filter(([type, freq]) => freq === highestFrequency);
+                    placeType = topPlaceTypes[Math.floor(Math.random() * topPlaceTypes.length)][0];
+                }
+
+                // Update or create the document in outputs collection
                 await outputsRef.doc(placeID).set({
                     conversationDifficultyElements,
                     conversationDifficultyFrequencies,
@@ -127,8 +195,22 @@ exports.aggregateUploadsData = functions.firestore
                     placeID,
                     placeType,
                     averageNoiseLevel,
+                    timeBasedData: {
+                        morning: {
+                            conversationDifficulty: timeBasedDifficulties.morning,
+                            averageNoiseLevel: timeBasedNoiseLevels.morning
+                        },
+                        afternoon: {
+                            conversationDifficulty: timeBasedDifficulties.afternoon,
+                            averageNoiseLevel: timeBasedNoiseLevels.afternoon
+                        },
+                        evening: {
+                            conversationDifficulty: timeBasedDifficulties.evening,
+                            averageNoiseLevel: timeBasedNoiseLevels.evening
+                        }
+                    },
                     submissionCount,
-                    latestUploadTimestamp, // Add the latest upload timestamp to the output
+                    latestUploadTimestamp,
                     WIP: WIP
                 }, {merge: true});
             }
