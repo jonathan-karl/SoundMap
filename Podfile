@@ -6,6 +6,7 @@ target 'SoundMap' do
   pod 'Google-Maps-iOS-Utils'
   pod 'GooglePlaces'
   pod 'GoogleSignIn'
+  pod 'GoogleSignInSwift'
   pod 'GoogleAnalytics'
   pod 'Firebase'
   pod 'FirebaseAuth'

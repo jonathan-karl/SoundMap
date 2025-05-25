@@ -19,6 +19,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     private var isZoomingToCluster = false
     private var customInfoWindow: CustomInfoWindow?
     private var selectedMarker: GMSMarker?
+    private var clusteringTimer: Timer?
     var locationManager: CLLocationManager?
     var clusterManager: GMUClusterManager!
     var visibleLabels: [GMSMarker: Bool] = [:]
@@ -252,10 +253,14 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
     }
     
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-        clusterManager.cluster()
-        updateVisibleLabels()
-        if let marker = selectedMarker {
-            updateInfoWindowPosition(for: marker)
+        clusteringTimer?.invalidate()
+        clusteringTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { [weak self] _ in
+            guard let self = self else { return }
+            self.clusterManager.cluster()
+            self.updateVisibleLabels()
+            if let marker = self.selectedMarker {
+                self.updateInfoWindowPosition(for: marker)
+            }
         }
     }
     
@@ -491,7 +496,7 @@ class MapsViewController: UIViewController, CLLocationManagerDelegate, GMSMapVie
         case "restaurant":
             iconView.image = UIImage(systemName: "fork.knife")
         case "bar":
-            iconView.image = UIImage(systemName: "mug.fill")
+            iconView.image = UIImage(systemName: "wineglass.fill")
         case "cafe":
             iconView.image = UIImage(systemName: "cup.and.saucer.fill")
         case "lodging":
@@ -718,7 +723,7 @@ private extension MapsViewController {
             object: nil
         )
     }
-
+    
     @objc func handleMemoryWarning() {
         // Clear cached marker images
         markers.forEach { marker in

@@ -8,8 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		1E4F14B0673B253F049EB79F /* Pods_SoundMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71C479ECAF4BCABFC4A2D80F /* Pods_SoundMap.framework */; };
+		60B5CE462DE34F0200599F3C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5CE452DE34F0200599F3C /* LoginView.swift */; };
+		60B5CE482DE3554F00599F3C /* AccountSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5CE472DE3554F00599F3C /* AccountSection.swift */; };
+		60B5CE4A2DE356F500599F3C /* LoginHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5CE492DE356F500599F3C /* LoginHelper.swift */; };
+		60DD315C2DE343CC000A7AD8 /* InfoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DD315B2DE343CC000A7AD8 /* InfoWindowView.swift */; };
 		AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */; };
-		AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */; };
 		AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */; };
 		AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */; };
 		AB2EE0B82C8114F40060121C /* MapStyle.json in Resources */ = {isa = PBXBuildFile; fileRef = AB2EE0B72C8114F40060121C /* MapStyle.json */; };
@@ -32,10 +35,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		60B5CE452DE34F0200599F3C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		60B5CE472DE3554F00599F3C /* AccountSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSection.swift; sourceTree = "<group>"; };
+		60B5CE492DE356F500599F3C /* LoginHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginHelper.swift; sourceTree = "<group>"; };
+		60DD315B2DE343CC000A7AD8 /* InfoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoWindowView.swift; sourceTree = "<group>"; };
 		6386734B163868609BFBC01C /* Pods-SoundMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoundMap.release.xcconfig"; path = "Target Support Files/Pods-SoundMap/Pods-SoundMap.release.xcconfig"; sourceTree = "<group>"; };
 		71C479ECAF4BCABFC4A2D80F /* Pods_SoundMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SoundMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadViewController.swift; sourceTree = "<group>"; };
-		AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InfoWindowView.swift; path = /Users/jonathan/Downloads/Noise/SoundMap/Controller/InfoWindowView.swift; sourceTree = "<absolute>"; };
 		AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomeClusterRenderer.swift; sourceTree = "<group>"; };
 		AB24DACF2C82762B000C5A73 /* AnimatedLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLaunchScreen.swift; sourceTree = "<group>"; };
 		AB2EE0B72C8114F40060121C /* MapStyle.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MapStyle.json; sourceTree = "<group>"; };
@@ -84,7 +90,7 @@
 		AB32861C2B79587C005D50FC /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				AB24DACA2C81B954000C5A73 /* InfoWindowView.swift */,
+				60DD315B2DE343CC000A7AD8 /* InfoWindowView.swift */,
 				AB24DACD2C81C127000C5A73 /* CustomeClusterRenderer.swift */,
 				AB8D8E252B7950D30074520B /* MapsViewController.swift */,
 				AB8D8E372B7952EC0074520B /* RecordViewController.swift */,
@@ -93,6 +99,9 @@
 				AB9831702B7F8738009DAEC3 /* MoreInfoViewController.swift */,
 				AB0E418E2B7BC89500CF3283 /* UploadViewController.swift */,
 				ABE28FBD2C8A2C6C00B09220 /* UserTabView.swift */,
+				60B5CE452DE34F0200599F3C /* LoginView.swift */,
+				60B5CE492DE356F500599F3C /* LoginHelper.swift */,
+				60B5CE472DE3554F00599F3C /* AccountSection.swift */,
 				ABE28FBF2C8A2CB300B09220 /* UserTabViewController.swift */,
 				ABE28FC72C8B92ED00B09220 /* LocationNotificationManager.swift */,
 				ABFF67382CF0C48900728E9E /* NotificationLogger.swift */,
@@ -226,9 +235,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -243,9 +256,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SoundMap/Pods-SoundMap-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -283,14 +300,17 @@
 			files = (
 				ABA2BCDB2B7A012400257211 /* RecordAudioViewController.swift in Sources */,
 				ABE28FBE2C8A2C6C00B09220 /* UserTabView.swift in Sources */,
+				60B5CE4A2DE356F500599F3C /* LoginHelper.swift in Sources */,
 				ABE28FC62C8B92AA00B09220 /* IgnoredLocationsView.swift in Sources */,
 				ABE28FC82C8B92ED00B09220 /* LocationNotificationManager.swift in Sources */,
 				AB0E418F2B7BC89500CF3283 /* UploadViewController.swift in Sources */,
+				60DD315C2DE343CC000A7AD8 /* InfoWindowView.swift in Sources */,
 				AB24DACE2C81C127000C5A73 /* CustomeClusterRenderer.swift in Sources */,
 				AB24DAD02C82762B000C5A73 /* AnimatedLaunchScreen.swift in Sources */,
-				AB24DACB2C81B954000C5A73 /* InfoWindowView.swift in Sources */,
 				AB8D8E262B7950D30074520B /* MapsViewController.swift in Sources */,
 				AB8D8E222B7950D30074520B /* AppDelegate.swift in Sources */,
+				60B5CE462DE34F0200599F3C /* LoginView.swift in Sources */,
+				60B5CE482DE3554F00599F3C /* AccountSection.swift in Sources */,
 				ABFF67392CF0C48900728E9E /* NotificationLogger.swift in Sources */,
 				AB8D8E242B7950D30074520B /* SceneDelegate.swift in Sources */,
 				ABE28FC02C8A2CB300B09220 /* UserTabViewController.swift in Sources */,

@@ -12,8 +12,8 @@ import GoogleMapsUtils
 class CustomClusterRenderer: NSObject, GMUClusterRenderer {
     private weak var mapView: GMSMapView?
     private var markers: [GMSMarker] = []
-    private let minClusterSize: Int = 5
-    private let maxVisibleMarkers: Int = 30  // Limit total visible markers
+    private let minClusterSize: Int = 3
+    private let maxVisibleMarkers: Int = 60  // Limit total visible markers
     private let clusteringDistanceMultiplier: Double = 1.5
     weak var delegate: GMUClusterRendererDelegate?
     
@@ -26,98 +26,97 @@ class CustomClusterRenderer: NSObject, GMUClusterRenderer {
         
         guard let mapView = mapView else { return }
         
-        // Get visible bounds
         let visibleRegion = mapView.projection.visibleRegion()
         let bounds = GMSCoordinateBounds(coordinate: visibleRegion.farLeft, coordinate: visibleRegion.nearRight)
         
-        // Sort clusters by size (larger clusters first) and filter to visible region
+        // Filter only visible clusters
         let visibleClusters = clusters
             .filter { bounds.contains($0.position) }
-            .sorted { $0.count > $1.count }
+            .sorted { $0.count > $1.count } // Largest clusters first
         
-        var totalMarkersShown = 0
-        var processedClusters: [GMSMarker] = []
+        guard !visibleClusters.isEmpty else {
+            print("🟡 No clusters to render in current view.")
+            return
+        }
+        
+        var markersShown = 0
         
         for cluster in visibleClusters {
-            // Stop if we've hit our marker limit
-            if totalMarkersShown >= maxVisibleMarkers {
-                // Force clustering for remaining items
-                let remainingMarker = createClusterMarker(for: cluster)
-                if let marker = remainingMarker {
-                    processedClusters.append(marker)
+            guard markersShown < maxVisibleMarkers else {
+                // If limit reached, show as one collapsed cluster marker (correct count)
+                if let marker = createClusterMarker(for: cluster, countOverride: Int(cluster.count)) {
+                    marker.map = mapView
+                    markers.append(marker)
                 }
                 continue
             }
             
-            let position = cluster.position
             let zoomLevel = Double(mapView.camera.zoom)
             
-            // Determine if we should cluster based on zoom level and count
             if shouldCluster(cluster: cluster, zoomLevel: zoomLevel) {
-                if let marker = createClusterMarker(for: cluster) {
-                    processedClusters.append(marker)
-                    totalMarkersShown += 1
+                // Render as a cluster
+                if let marker = createClusterMarker(for: cluster, countOverride: Int(cluster.count)) {
+                    marker.map = mapView
+                    markers.append(marker)
+                    markersShown += 1
                 }
             } else {
-                // Calculate how many individual markers we can still show
-                let remainingSlots = maxVisibleMarkers - totalMarkersShown
-                let markersToShow = min(cluster.items.count, remainingSlots)
+                // Render individual items
+                let availableSlots = maxVisibleMarkers - markersShown
+                let items = Array(cluster.items.prefix(availableSlots))
                 
-                // Show individual markers
-                for i in 0..<markersToShow {
-                    if let item = cluster.items[i] as? GMSMarker {
-                        let marker = GMSMarker(position: item.position)
-                        marker.title = item.title
-                        marker.snippet = item.snippet
-                        marker.icon = item.icon
-                        marker.groundAnchor = item.groundAnchor
-                        marker.userData = item.userData
+                for item in items {
+                    if let gmsMarker = item as? GMSMarker {
+                        let marker = GMSMarker(position: gmsMarker.position)
+                        marker.title = gmsMarker.title
+                        marker.snippet = gmsMarker.snippet
+                        marker.icon = gmsMarker.icon
+                        marker.userData = gmsMarker.userData
+                        marker.groundAnchor = gmsMarker.groundAnchor
                         marker.map = mapView
-                        processedClusters.append(marker)
+                        markers.append(marker)
+                        markersShown += 1
                     }
                 }
                 
-                totalMarkersShown += markersToShow
-                
-                // If we couldn't show all markers in this cluster, create a cluster for the remaining ones
-                if markersToShow < cluster.items.count {
-                    let remainingCount = cluster.items.count - markersToShow
-                    let marker = GMSMarker(position: position)
-                    marker.icon = imageWithText(text: "\(remainingCount)", color: .systemBlue)
-                    marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
-                    marker.map = mapView
-                    processedClusters.append(marker)
+                // If there were remaining items, add a proper cluster marker to represent the rest
+                let remainingCount = Int(cluster.count) - items.count
+                if remainingCount > 0 {
+                    if let marker = createClusterMarker(for: cluster, countOverride: remainingCount) {
+                        marker.map = mapView
+                        markers.append(marker)
+                        markersShown += 1
+                    }
                 }
             }
         }
-        
-        markers = processedClusters
     }
+    
     
     private func shouldCluster(cluster: GMUCluster, zoomLevel: Double) -> Bool {
         // Base clustering on zoom level and cluster size
         if cluster.count >= minClusterSize {
             switch zoomLevel {
-            case ...12: // Zoomed way out
-                return true
-            case 13...15: // Mid zoom
-                return cluster.count > 3
-            case 16...17: // Closer zoom
-                return cluster.count > 8
-            default: // Very close zoom
-                return cluster.count > 15
+            case ...12:
+                return cluster.count > 10
+            case 13...15:
+                return cluster.count > 6
+            case 16...17:
+                return cluster.count > 12
+            default:
+                return cluster.count > 20
             }
         }
         return false
     }
     
-    private func createClusterMarker(for cluster: GMUCluster) -> GMSMarker? {
+    private func createClusterMarker(for cluster: GMUCluster, countOverride: Int) -> GMSMarker? {
         let marker = GMSMarker(position: cluster.position)
-        marker.icon = imageWithText(text: "\(cluster.count)", color: .systemBlue)
+        marker.icon = imageWithText(text: "\(countOverride)", color: .systemBlue)
         marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
-        marker.map = mapView
         return marker
     }
+    
     
     private func imageWithText(text: String, color: UIColor) -> UIImage {
         let size = CGSize(width: 40, height: 40)

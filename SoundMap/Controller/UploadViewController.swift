@@ -8,8 +8,10 @@
 import UIKit
 import CoreLocation
 import FirebaseCore
+import FirebaseAuth
 import FirebaseFirestore
 import GoogleAnalytics
+
 
 class UploadViewController: UIViewController {
     
@@ -93,13 +95,25 @@ class UploadViewController: UIViewController {
             } else {
                 print("Metadata successfully uploaded")
                 uploadCompleted = true
+                
+                // Increment user submission count in Firestore
+                if let user = Auth.auth().currentUser {
+                    let db = Firestore.firestore()
+                    let nickname = UserDefaults.standard.string(forKey: "nickname") ?? ""
+                    
+                    db.collection("users").document(user.uid).setData([
+                        "nickname": nickname,
+                        "submissionCount": FieldValue.increment(Int64(1))
+                    ], merge: true)
+                }
+                
                 DispatchQueue.main.async {
                     self?.uploadProgressView.progress = 1.0
-                    // Trigger UI changes after a brief moment to show completion
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self?.animateUIChanges()
                     }
                 }
+                
             }
         }
         

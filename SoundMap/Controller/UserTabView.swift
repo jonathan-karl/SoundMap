@@ -1,19 +1,140 @@
 import SwiftUI
+import FirebaseFirestoreInternal
+import FirebaseAuth
 import UserNotifications
 import CoreLocation
 import GoogleAnalytics
 
-class UserViewModel: ObservableObject {
+final class UserViewModel: ObservableObject {
     @Published var notificationStatus: String = "Checking..."
     @Published var locationStatus: String = "Checking..."
-    @Published var appVersion = "1.2"
+    @Published var appVersion = "1.3"
+    
+    @Published var leaderboardEntries: [LeaderboardEntry] = []
+    @Published var searchText: String = ""
+    @Published var submissionCount: Int = 0
+    @Published var userEmail: String = ""
+    @Published var profileImage: UIImage? = nil
+    @Published var nicknameError: String?
+    @Published var firebaseUser: User?           // nil = logged-out
+    @Published var nickname     : String = UserDefaults.standard.string(forKey: "nickname") ?? ""
+    var isLoggedIn: Bool { firebaseUser != nil }
+    
+    var canSeeLeaderboard: Bool {
+        firebaseUser != nil &&
+        submissionCount > 0 &&
+        !nickname.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    var filteredLeaderboard: [LeaderboardEntry] {
+        guard !searchText.isEmpty else { return leaderboardEntries }
+        return leaderboardEntries.filter {
+            $0.nickname.lowercased().contains(searchText.lowercased())
+        }
+    }
     
     private let locationManager = CLLocationManager()
     
     init() {
         checkNotificationStatus()
         checkLocationStatus()
+        observeAuthChanges()
+        
     }
+    
+    private func observeAuthChanges() {
+        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            self?.firebaseUser = user        // triggers a UI refresh
+            if user == nil {
+                // … sign-out branch …
+                self?.userEmail = ""
+                self?.submissionCount = 0
+            } else {
+                self?.userEmail = user!.email ?? ""       // NEW — comes from FirebaseAuth
+                
+                Firestore.firestore().collection("users")
+                    .document(user!.uid)
+                    .getDocument { snap, _ in
+                        guard let data = snap?.data() else { return }
+                        self?.nickname        = data["nickname"]        as? String ?? ""
+                        self?.userEmail       = data["email"]           as? String ?? self?.userEmail ?? "" // keep Auth value if field missing
+                        self?.submissionCount = data["submissionCount"] as? Int    ?? 0
+                        
+                        // Show leaderboard automatically when the user qualifies
+                        if self?.canSeeLeaderboard == true { self?.fetchLeaderboard() }
+                    }
+                // 🔄 keep local cache in sync with the canonical cloud copy
+                UserDefaults.standard.set(self?.nickname,        forKey: "nickname")
+                
+                // ──  Download Google profile photo ──────────────────────────
+                if  let url  = user?.photoURL {                     // ← already set by Firebase
+                    URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+                        guard let data = data,
+                              let img  = UIImage(data: data) else { return }
+                        DispatchQueue.main.async { self?.profileImage = img }  // published
+                    }.resume()
+                }
+
+                
+            }
+        }
+    }
+    
+    // Exposed entry points -------------- //
+    func googleSignIn()  { LoginHelper.googleSignIn() }
+    func signOut() throws {
+        try Auth.auth().signOut()
+
+        // 🔄 purge local cache
+        UserDefaults.standard.removeObject(forKey: "nickname")
+
+        // 🔄 reset in-memory values so the UI clears instantly
+        nickname        = ""
+    }
+    
+    func saveProfile() {
+        guard let user = firebaseUser else { return }
+        let cleanName = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanName.isEmpty else { return }
+
+        let db = Firestore.firestore()
+        // 1️⃣  Does somebody else already own this nickname?
+        db.collection("users")
+          .whereField("nickname", isEqualTo: cleanName)
+          .getDocuments { [weak self] snap, error in
+              if let error = error {
+                  print("🔥 nickname lookup failed:", error.localizedDescription)
+                  return
+              }
+
+              // Any document whose ID ≠ my UID = duplicate
+              if snap?.documents.contains(where: { $0.documentID != user.uid }) == true {
+                  print("🚫 nickname taken")
+                  self?.nicknameError = "Nickname already taken"   // ← set error
+                  return                              // 👉 early-out – don’t save
+              }
+
+              // 2️⃣  Safe to save
+              // — local cache for offline resilience —
+              UserDefaults.standard.set(cleanName,             forKey: "nickname")
+
+              // — remote canonical copy —
+              db.collection("users")
+                .document(user.uid)
+                .setData([
+                    "nickname":        cleanName,
+                    "email":           user.email ?? ""
+                ], merge: true) { err in
+                    if let err = err {
+                        print("🔥 profile save failed:", err.localizedDescription)
+                    } else {
+                        self?.nicknameError = nil   
+                        print("✅ profile saved")
+                    }
+                }
+          }
+    }
+
     
     func checkNotificationStatus() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -72,6 +193,33 @@ class UserViewModel: ObservableObject {
             ).build() as [NSObject : AnyObject])
         }
     }
+    
+    func fetchLeaderboard() {
+        Firestore.firestore()
+            .collection("users")
+            .order(by: "submissionCount", descending: true)
+            .limit(to: 10)
+            .getDocuments { snapshot, error in
+                guard let documents = snapshot?.documents else { return }
+                DispatchQueue.main.async {
+                    self.leaderboardEntries = documents.compactMap { doc in
+                        let data = doc.data()
+                        return LeaderboardEntry(
+                            nickname: data["nickname"] as? String ?? "Anonymous",
+                            count: data["submissionCount"] as? Int ?? 0
+                        )
+                    }
+                }
+            }
+    }
+    
+    
+}
+
+struct LeaderboardEntry: Identifiable {
+    let id = UUID()
+    let nickname: String
+    let count: Int
 }
 
 struct UserTabView: View {
@@ -83,6 +231,8 @@ struct UserTabView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     welcomeSection
+                    if viewModel.canSeeLeaderboard { leaderboardSection }
+                    AccountSection(viewModel: viewModel)
                     helpAndPreferencesSection
                     ignoredLocationsSection
                     feedbackSection
@@ -91,6 +241,10 @@ struct UserTabView: View {
             }
             .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle("Settings")
+            
+            .onAppear {
+                if viewModel.canSeeLeaderboard { viewModel.fetchLeaderboard() }
+            }
         }
     }
     
@@ -108,6 +262,64 @@ struct UserTabView: View {
         .background(Color(UIColor.secondarySystemGroupedBackground))
         .cornerRadius(12)
     }
+    
+    // MARK: Leaderboard UI
+    @ViewBuilder
+    private var leaderboardSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Leaderboard")
+                .font(.headline)
+            Text("Who has submitted the most SoundReviews?")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            // Search field (iOS 15+)
+            TextField("Search nickname", text: $viewModel.searchText)
+                .textFieldStyle(.roundedBorder)
+
+            // Row list – scrollable only when needed
+            Group {
+                if viewModel.filteredLeaderboard.count > 10 {
+                    ScrollView {
+                        rows
+                    }
+                    .frame(maxHeight: 300)               // ≈10 rows
+                } else {
+                    rows
+                }
+            }
+        }
+        .padding()
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .cornerRadius(12)
+    }
+    
+    // Re-usable row builder
+    @ViewBuilder
+    private var rows: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(viewModel.filteredLeaderboard.indices, id: \.self) { idx in
+                let entry = viewModel.filteredLeaderboard[idx]
+                HStack {
+                    Text("#\(idx + 1)")
+                        .fontWeight(.bold)
+                        .frame(minWidth: 32, alignment: .leading)
+
+                    Text(entry.nickname)
+                        .fontWeight(entry.nickname == viewModel.nickname ? .bold : .regular)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+
+                    Spacer()
+
+                    Text("\(entry.count)")
+                        .fontWeight(.bold)
+                }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+
     
     private var helpAndPreferencesSection: some View {
         VStack(alignment: .leading, spacing: 16) {

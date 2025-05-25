@@ -1071,6 +1071,7 @@ PODS:
     - AppAuth (< 2.0, >= 1.7.3)
     - GTMAppAuth (< 5.0, >= 4.1.1)
     - GTMSessionFetcher/Core (~> 3.3)
+  - GoogleSignInSwift (0.3.2)
   - GoogleUtilities/AppDelegateSwizzler (7.13.3):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -1203,6 +1204,7 @@ DEPENDENCIES:
   - GoogleMaps (= 8.4.0)
   - GooglePlaces
   - GoogleSignIn
+  - GoogleSignInSwift
 
 SPEC REPOS:
   trunk:
@@ -1229,6 +1231,7 @@ SPEC REPOS:
     - GoogleMaps
     - GooglePlaces
     - GoogleSignIn
+    - GoogleSignInSwift
     - GoogleUtilities
     - "gRPC-C++"
     - gRPC-Core
@@ -1264,6 +1267,7 @@ SPEC CHECKSUMS:
   GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
   GooglePlaces: 00c43ad62c888354fe0bc5ce09181b2f6ce8b6d1
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
+  GoogleSignInSwift: b7d54b0ab8d9fd17928ab9b68d91a65d82e056d7
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   "gRPC-C++": e725ef63c4475d7cdb7e2cf16eb0fde84bd9ee51
   gRPC-Core: eee4be35df218649fe66d721a05a7f27a28f069b
@@ -1275,6 +1279,6 @@ SPEC CHECKSUMS:
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   SwiftAlgorithms: 38dda4731d19027fdeee1125f973111bf3386b53
 
-PODFILE CHECKSUM: e5dc0d61ba7f08e379e7de442f023c43361c8224
+PODFILE CHECKSUM: d5ff3e8bcc19a353cc8fc89df5a8d2111b59f73a
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
