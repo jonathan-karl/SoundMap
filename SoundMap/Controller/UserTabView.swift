@@ -8,7 +8,7 @@ import GoogleAnalytics
 final class UserViewModel: ObservableObject {
     @Published var notificationStatus: String = "Checking..."
     @Published var locationStatus: String = "Checking..."
-    @Published var appVersion = "1.3"
+    @Published var appVersion = "1.4"
     
     @Published var leaderboardEntries: [LeaderboardEntry] = []
     @Published var searchText: String = ""
